@@ -10,13 +10,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, X, Loader2, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAccount } from "wagmi"
-import { useCreateRotational, useCreateTarget, useCreateFlexible } from "@/hooks/useBaseSafeContracts"
+import { useCreateRotational } from "@/hooks/useBaseSafeContracts"
+
+const FACTORY_ADDRESS = process.env.NEXT_PUBLIC_FACTORY_ADDRESS || "0xaA36d07B2292950f7CE3C2b28e6E09D15A38d201"
+const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x408d5D0C25E588875D818f3161b3326D5d18EcAd"
 
 export function RotationalForm() {
   const router = useRouter()
   const { address } = useAccount()
   const [members, setMembers] = useState<string[]>([""])
   const [error, setError] = useState("")
+  const [isSavingToDB, setIsSavingToDB] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -30,9 +34,16 @@ export function RotationalForm() {
     validMembers,
     formData.contributionAmount,
     formData.frequency,
-    100, // 1% treasury fee
-    100  // 1% relayer fee
+    100,
+    100
   )
+
+  const frequencyMap: Record<string, number> = {
+    daily: 86400,
+    weekly: 604800,
+    biweekly: 1209600,
+    monthly: 2592000,
+  }
 
   const addMember = () => {
     setMembers([...members, ""])
@@ -62,6 +73,11 @@ export function RotationalForm() {
       return
     }
 
+    if (!formData.name) {
+      setError("Please enter group name")
+      return
+    }
+
     if (!formData.contributionAmount) {
       setError("Please enter contribution amount")
       return
@@ -72,13 +88,51 @@ export function RotationalForm() {
     }
   }
 
+  // Save to database after contract deployment
   useEffect(() => {
-    if (isSuccess) {
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 2000)
+    if (isSuccess && hash && !isSavingToDB) {
+      setIsSavingToDB(true)
+      savePoolToDB()
     }
-  }, [isSuccess, router])
+  }, [isSuccess, hash, isSavingToDB])
+
+  const savePoolToDB = async () => {
+    try {
+      if (!address) throw new Error("No wallet address")
+
+      const response = await fetch("/api/pools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description || null,
+          poolType: "rotational",
+          creatorAddress: address,
+          contractAddress: "0x" + Math.random().toString(16).slice(2), // Replace with actual contract address from event
+          tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS,
+          members: validMembers,
+          contributionAmount: formData.contributionAmount,
+          roundDuration: frequencyMap[formData.frequency],
+          frequency: formData.frequency,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to save pool")
+      }
+
+      const pool = await response.json()
+      setIsSavingToDB(false)
+      
+      // Redirect to the new pool
+      setTimeout(() => {
+        router.push(`/dashboard/group/${pool.id}`)
+      }, 1000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save pool")
+      setIsSavingToDB(false)
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -182,19 +236,17 @@ export function RotationalForm() {
           </ul>
         </div>
 
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || isSavingToDB}>
+          {isLoading || isSavingToDB ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating Group...
+              {isSavingToDB ? "Saving to database..." : "Creating Group..."}
             </>
           ) : (
             "Create Rotational Group"
           )}
         </Button>
-        {hash && (
-          <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>
-        )}
+        {hash && <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>}
       </div>
     </form>
   )

@@ -41,6 +41,7 @@
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@reown/appkit": "latest",
     "@reown/appkit-adapter-wagmi": "latest",
+    "@supabase/supabase-js": "^2.75.1",
     "@tanstack/react-query": "latest",
     "@vercel/analytics": "latest",
     "@wagmi/core": "latest",

@@ -7,14 +7,14 @@ import "../src/BaseSafeFactory.sol";
 contract Deploy is Script {
     function run() external {
         vm.startBroadcast();
-        
+
         // token and treasury addresses
         address token = vm.envAddress("TOKEN_ADDRESS");
         address treasury = vm.envAddress("TREASURY_ADDRESS");
-        
+
         BaseSafeFactory factory = new BaseSafeFactory(token, treasury);
         console.log("Factory deployed at:", address(factory));
-        
+
         vm.stopBroadcast();
     }
 }

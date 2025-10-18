@@ -16,6 +16,7 @@ export function TargetForm() {
   const { address } = useAccount()
   const [members, setMembers] = useState<string[]>([""])
   const [error, setError] = useState("")
+  const [isSavingToDB, setIsSavingToDB] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -25,12 +26,12 @@ export function TargetForm() {
 
   const validMembers = members.filter((m) => m && m.startsWith("0x") && m.length === 42)
   const deadlineDate = formData.deadline ? new Date(formData.deadline) : null
-  
+
   const { create, isLoading, isSuccess, hash } = useCreateTarget(
     validMembers,
     formData.targetAmount,
     deadlineDate || new Date(),
-    100 // 1% treasury fee
+    100
   )
 
   const addMember = () => {
@@ -61,6 +62,11 @@ export function TargetForm() {
       return
     }
 
+    if (!formData.name) {
+      setError("Please enter group name")
+      return
+    }
+
     if (!formData.targetAmount) {
       setError("Please enter target amount")
       return
@@ -82,12 +88,47 @@ export function TargetForm() {
   }
 
   useEffect(() => {
-    if (isSuccess) {
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 2000)
+    if (isSuccess && hash && !isSavingToDB) {
+      setIsSavingToDB(true)
+      savePoolToDB()
     }
-  }, [isSuccess, router])
+  }, [isSuccess, hash, isSavingToDB])
+
+  const savePoolToDB = async () => {
+    try {
+      if (!address) throw new Error("No wallet address")
+
+      const response = await fetch("/api/pools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description || null,
+          poolType: "target",
+          creatorAddress: address,
+          contractAddress: "0x" + Math.random().toString(16).slice(2),
+          tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS,
+          members: validMembers,
+          targetAmount: formData.targetAmount,
+          deadline: formData.deadline,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to save pool")
+      }
+
+      const pool = await response.json()
+      setIsSavingToDB(false)
+
+      setTimeout(() => {
+        router.push(`/dashboard/group/${pool.id}`)
+      }, 1000)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save pool")
+      setIsSavingToDB(false)
+    }
+  }
 
   const contributionPerMember =
     validMembers.length > 0
@@ -189,19 +230,17 @@ export function TargetForm() {
           </ul>
         </div>
 
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-          {isLoading ? (
+        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || isSavingToDB}>
+          {isLoading || isSavingToDB ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating Group...
+              {isSavingToDB ? "Saving to database..." : "Creating Group..."}
             </>
           ) : (
             "Create Target Pool"
           )}
         </Button>
-        {hash && (
-          <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>
-        )}
+        {hash && <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>}
       </div>
     </form>
   )

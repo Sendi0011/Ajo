@@ -1,6 +1,6 @@
 "use client"
 
-import { use } from "react"
+import { use, useEffect, useState } from "react"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { GroupDetails } from "@/components/group/group-details"
 import { GroupMembers } from "@/components/group/group-members"
@@ -10,14 +10,34 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
+interface Pool {
+  id: string
+  name: string
+  type: 'rotational' | 'target' | 'flexible'
+  contract_address: string
+  token_address: string
+}
+
 export default function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
+  const [pool, setPool] = useState<Pool | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // TODO: Fetch from your backend/database
-  // For now, these should come from your DB when you save pool creation
-  const poolAddress = process.env.NEXT_PUBLIC_FACTORY_ADDRESS || "0x0" // Replace with actual pool address
-  const poolType: "rotational" | "target" | "flexible" = "rotational" // Replace with actual type
-  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x0"
+  useEffect(() => {
+    fetch(`/api/pools?id=${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setPool(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Failed to load pool:', err)
+        setLoading(false)
+      })
+  }, [id])
+
+  if (loading) return <div>Loading...</div>
+  if (!pool) return <div>Pool not found</div>
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,9 +58,9 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
           <div className="space-y-6">
             <GroupActions 
               groupId={id}
-              poolAddress={poolAddress}
-              poolType={poolType}
-              tokenAddress={tokenAddress}
+              poolAddress={pool.contract_address}
+              poolType={pool.type}
+              tokenAddress={pool.token_address}
             />
             <GroupMembers groupId={id} />
           </div>
