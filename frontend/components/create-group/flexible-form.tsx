@@ -1,20 +1,21 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Plus, X, Loader2 } from "lucide-react"
+import { Plus, X, Loader2, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useAccount } from "wagmi"
+import { useCreateFlexible } from "@/hooks/useBaseSafeContracts"
 
 export function FlexibleForm() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const { address } = useAccount()
   const [members, setMembers] = useState<string[]>([""])
+  const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -22,6 +23,16 @@ export function FlexibleForm() {
     enableYield: false,
     withdrawalFee: "1",
   })
+
+  const validMembers = members.filter((m) => m && m.startsWith("0x") && m.length === 42)
+  
+  const { create, isLoading, isSuccess, hash } = useCreateFlexible(
+    validMembers,
+    formData.minimumDeposit,
+    formData.withdrawalFee,
+    formData.enableYield,
+    100 // 1% treasury fee
+  )
 
   const addMember = () => {
     setMembers([...members, ""])
@@ -39,18 +50,45 @@ export function FlexibleForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setError("")
 
-    // Simulate smart contract deployment
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    if (!address) {
+      setError("Please connect your wallet first")
+      return
+    }
 
-    console.log("[v0] Creating flexible pool group:", { ...formData, members })
-    setIsLoading(false)
-    router.push("/dashboard")
+    if (validMembers.length < 2) {
+      setError("Need at least 2 valid members (0x...)")
+      return
+    }
+
+    if (!formData.minimumDeposit) {
+      setError("Please enter minimum deposit")
+      return
+    }
+
+    if (create) {
+      create()
+    }
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      setTimeout(() => {
+        router.push("/dashboard")
+      }, 2000)
+    }
+  }, [isSuccess, router])
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="flex gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="name">Group Name</Label>
         <Input
@@ -106,10 +144,12 @@ export function FlexibleForm() {
           <Label htmlFor="yield">Enable Yield Generation</Label>
           <p className="text-sm text-muted-foreground">Stake idle funds in Base DeFi protocols for passive income</p>
         </div>
-        <Switch
+        <input
           id="yield"
+          type="checkbox"
           checked={formData.enableYield}
-          onCheckedChange={(checked) => setFormData({ ...formData, enableYield: checked })}
+          onChange={(e) => setFormData({ ...formData, enableYield: e.target.checked })}
+          className="h-4 w-4 rounded"
         />
       </div>
 
@@ -129,7 +169,6 @@ export function FlexibleForm() {
                 placeholder="0x..."
                 value={member}
                 onChange={(e) => updateMember(index, e.target.value)}
-                required
               />
               {members.length > 1 && (
                 <Button type="button" variant="ghost" size="icon" onClick={() => removeMember(index)}>
@@ -145,7 +184,7 @@ export function FlexibleForm() {
         <div className="bg-muted/30 rounded-lg p-4 mb-6">
           <h4 className="font-semibold mb-2">Summary</h4>
           <ul className="space-y-1 text-sm text-muted-foreground">
-            <li>Total Members: {members.filter((m) => m).length}</li>
+            <li>Total Members: {validMembers.length}</li>
             <li>Minimum Deposit: {formData.minimumDeposit || "0"} ETH</li>
             <li>Withdrawal Fee: {formData.withdrawalFee}%</li>
             <li>Yield Generation: {formData.enableYield ? "Enabled" : "Disabled"}</li>
@@ -162,6 +201,9 @@ export function FlexibleForm() {
             "Create Flexible Pool"
           )}
         </Button>
+        {hash && (
+          <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>
+        )}
       </div>
     </form>
   )

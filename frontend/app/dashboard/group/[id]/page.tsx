@@ -13,6 +13,12 @@ import Link from "next/link"
 export default function GroupPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
 
+  // TODO: Fetch from your backend/database
+  // For now, these should come from your DB when you save pool creation
+  const poolAddress = process.env.NEXT_PUBLIC_FACTORY_ADDRESS || "0x0" // Replace with actual pool address
+  const poolType: "rotational" | "target" | "flexible" = "rotational" // Replace with actual type
+  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x0"
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader />
@@ -30,7 +36,12 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
             <GroupActivity groupId={id} />
           </div>
           <div className="space-y-6">
-            <GroupActions groupId={id} />
+            <GroupActions 
+              groupId={id}
+              poolAddress={poolAddress}
+              poolType={poolType}
+              tokenAddress={tokenAddress}
+            />
             <GroupMembers groupId={id} />
           </div>
         </div>
