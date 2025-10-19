@@ -1,24 +1,28 @@
-"use client"
+"use client";
 
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Users, TrendingUp, Calendar, ArrowRight, Loader2 } from "lucide-react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
-import { useAccount } from "wagmi"
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Users, TrendingUp, Calendar, ArrowRight, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useAccount } from "wagmi";
 
 interface Pool {
-  id: string
-  name: string
-  type: 'rotational' | 'target' | 'flexible'
-  status: 'active' | 'completed' | 'paused'
-  members_count: number
-  total_saved: number
-  progress: number
-  frequency?: string
-  next_payout?: string
+  id: string;
+  name: string;
+  type: "rotational" | "target" | "flexible";
+  status: "active" | "completed" | "paused";
+  members_count: number;
+  total_saved: number;
+  progress: number;
+  frequency?: string;
+  next_payout?: string;
+}
+
+interface MyGroupsProps {
+  onCreateClick?: () => void;
 }
 
 const container = {
@@ -29,57 +33,59 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
-}
+};
 
-export function MyGroups() {
-  const { address } = useAccount()
-  const [pools, setPools] = useState<Pool[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+export function MyGroups({ onCreateClick }: MyGroupsProps) {
+  const { address } = useAccount();
+  const [pools, setPools] = useState<Pool[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!address) {
-      setLoading(false)
-      return
+      setLoading(false);
+      return;
     }
 
-    fetchPools()
-  }, [address])
+    fetchPools();
+  }, [address]);
 
   const fetchPools = async () => {
     try {
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
 
-      const response = await fetch(`/api/pools?creator=${address?.toLowerCase()}`)
+      const response = await fetch(
+        `/api/pools?creator=${address?.toLowerCase()}`
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch pools")
+        throw new Error("Failed to fetch pools");
       }
 
-      const data = await response.json()
-      setPools(Array.isArray(data) ? data : [])
+      const data = await response.json();
+      setPools(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch pools")
-      setPools([])
+      setError(err instanceof Error ? err.message : "Failed to fetch pools");
+      setPools([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const formatPoolType = (type: string) => {
-    return type.charAt(0).toUpperCase() + type.slice(1)
-  }
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
 
   const formatEth = (amount: number | null) => {
-    if (!amount) return "0 ETH"
-    return `${(amount).toFixed(2)} ETH`
-  }
+    if (!amount) return "0 ETH";
+    return `${amount.toFixed(2)} ETH`;
+  };
 
   if (loading) {
     return (
@@ -87,14 +93,16 @@ export function MyGroups() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold">My Groups</h2>
-            <p className="text-muted-foreground mt-1">Manage your savings circles</p>
+            <p className="text-muted-foreground mt-1">
+              Manage your savings circles
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -103,14 +111,16 @@ export function MyGroups() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold">My Groups</h2>
-            <p className="text-muted-foreground mt-1">Manage your savings circles</p>
+            <p className="text-muted-foreground mt-1">
+              Manage your savings circles
+            </p>
           </div>
         </div>
         <Card className="p-6 bg-destructive/10 text-destructive">
           <p>{error}</p>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -124,7 +134,9 @@ export function MyGroups() {
         <div>
           <h2 className="text-3xl font-bold">My Groups</h2>
           <p className="text-muted-foreground mt-1">
-            {pools.length === 0 ? "Manage your savings circles" : `${pools.length} active group${pools.length !== 1 ? "s" : ""}`}
+            {pools.length === 0
+              ? "Manage your savings circles"
+              : `${pools.length} active group${pools.length !== 1 ? "s" : ""}`}
           </p>
         </div>
       </motion.div>
@@ -142,10 +154,14 @@ export function MyGroups() {
               </div>
               <h3 className="text-xl font-semibold mb-2">No groups yet</h3>
               <p className="text-muted-foreground mb-6">
-                Create your first savings group or join an existing one to get started
+                Create your first savings group or join an existing one to get
+                started
               </p>
-              <Button className="bg-primary hover:bg-primary/90" asChild>
-                <Link href="/dashboard?tab=create">Create Your First Group</Link>
+              <Button
+                className="bg-primary hover:bg-primary/90"
+                onClick={onCreateClick}
+              >
+                Create Your First Group
               </Button>
             </div>
           </Card>
@@ -163,9 +179,13 @@ export function MyGroups() {
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <h3 className="text-xl font-semibold mb-1">{pool.name}</h3>
-                    <Badge variant="secondary">{formatPoolType(pool.type)}</Badge>
+                    <Badge variant="secondary">
+                      {formatPoolType(pool.type)}
+                    </Badge>
                   </div>
-                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20">{pool.status}</Badge>
+                  <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
+                    {pool.status}
+                  </Badge>
                 </div>
 
                 <div className="space-y-3 mb-4 flex-1">
@@ -181,14 +201,18 @@ export function MyGroups() {
                       <TrendingUp className="h-4 w-4" />
                       Total Saved
                     </span>
-                    <span className="font-medium">{formatEth(pool.total_saved)}</span>
+                    <span className="font-medium">
+                      {formatEth(pool.total_saved)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      {pool.type === 'rotational' ? 'Frequency' : 'Status'}
+                      {pool.type === "rotational" ? "Frequency" : "Status"}
                     </span>
-                    <span className="font-medium">{pool.frequency || pool.status}</span>
+                    <span className="font-medium">
+                      {pool.frequency || pool.status}
+                    </span>
                   </div>
                 </div>
 
@@ -207,7 +231,11 @@ export function MyGroups() {
                   </div>
                 </div>
 
-                <Button className="w-full bg-transparent" variant="outline" asChild>
+                <Button
+                  className="w-full bg-transparent"
+                  variant="outline"
+                  asChild
+                >
                   <Link href={`/dashboard/group/${pool.id}`}>
                     View Details
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -219,5 +247,5 @@ export function MyGroups() {
         </motion.div>
       )}
     </div>
-  )
+  );
 }

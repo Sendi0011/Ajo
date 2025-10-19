@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MyGroups } from "@/components/dashboard/my-groups"
 import { CreateGroup } from "@/components/dashboard/create-group"
@@ -10,6 +10,10 @@ import { Home, PlusCircle, Receipt, User } from "lucide-react"
 
 export function DashboardTabs() {
   const [activeTab, setActiveTab] = useState("groups")
+
+  const handleCreateClick = useCallback(() => {
+    setActiveTab("create")
+  }, [])
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -33,7 +37,7 @@ export function DashboardTabs() {
       </TabsList>
 
       <TabsContent value="groups" className="mt-0">
-        <MyGroups />
+        <MyGroups onCreateClick={handleCreateClick} />
       </TabsContent>
 
       <TabsContent value="create" className="mt-0">
