@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation"
 import { useAccount } from "wagmi"
 import { useCreateFlexible } from "@/hooks/useBaseSafeContracts"
 
+const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x408d5D0C25E588875D818f3161b3326D5d18EcAd"
+
 export function FlexibleForm() {
   const router = useRouter()
   const { address } = useAccount()
@@ -28,7 +30,7 @@ export function FlexibleForm() {
 
   const validMembers = members.filter((m) => m && m.startsWith("0x") && m.length === 42)
 
-  const { create, isLoading, isSuccess, hash } = useCreateFlexible(
+  const { create, isLoading, isSuccess, hash, poolAddress } = useCreateFlexible(
     validMembers,
     formData.minimumDeposit,
     formData.withdrawalFee,
@@ -81,17 +83,18 @@ export function FlexibleForm() {
 
   const hasAttemptedSave = useRef(false)
 
-useEffect(() => {
-  if (isSuccess && hash && !isSavingToDB && !hasAttemptedSave.current) {
-    hasAttemptedSave.current = true
-    setIsSavingToDB(true)
-    savePoolToDB()
-  }
-}, [isSuccess, hash, isSavingToDB])
+  useEffect(() => {
+    if (isSuccess && hash && poolAddress && !isSavingToDB && !hasAttemptedSave.current) {
+      hasAttemptedSave.current = true
+      setIsSavingToDB(true)
+      savePoolToDB()
+    }
+  }, [isSuccess, hash, poolAddress, isSavingToDB])
 
   const savePoolToDB = async () => {
     try {
       if (!address) throw new Error("No wallet address")
+      if (!poolAddress) throw new Error("Pool address not available")
 
       const response = await fetch("/api/pools", {
         method: "POST",
@@ -101,12 +104,13 @@ useEffect(() => {
           description: formData.description || null,
           poolType: "flexible",
           creatorAddress: address,
-          contractAddress: "0x" + Math.random().toString(16).slice(2),
-          tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS,
+          poolAddress: poolAddress,
+          tokenAddress: TOKEN_ADDRESS,
           members: validMembers,
           minimumDeposit: formData.minimumDeposit,
           withdrawalFee: formData.withdrawalFee,
           yieldEnabled: formData.enableYield,
+          txHash: hash,
         }),
       })
 

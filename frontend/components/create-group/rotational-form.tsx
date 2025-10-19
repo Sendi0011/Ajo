@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation"
 import { useAccount } from "wagmi"
 import { useCreateRotational } from "@/hooks/useBaseSafeContracts"
 
-const FACTORY_ADDRESS = process.env.NEXT_PUBLIC_FACTORY_ADDRESS || "0xaA36d07B2292950f7CE3C2b28e6E09D15A38d201"
 const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x408d5D0C25E588875D818f3161b3326D5d18EcAd"
 
 export function RotationalForm() {
@@ -31,7 +30,7 @@ export function RotationalForm() {
   })
 
   const validMembers = members.filter((m) => m && m.startsWith("0x") && m.length === 42)
-  const { create, isLoading, isSuccess, hash } = useCreateRotational(
+  const { create, isLoading, isSuccess, hash, poolAddress } = useCreateRotational(
     validMembers,
     formData.contributionAmount,
     formData.frequency,
@@ -89,20 +88,20 @@ export function RotationalForm() {
     }
   }
 
-  // Save to database after contract deployment
   const hasAttemptedSave = useRef(false)
 
-useEffect(() => {
-  if (isSuccess && hash && !isSavingToDB && !hasAttemptedSave.current) {
-    hasAttemptedSave.current = true
-    setIsSavingToDB(true)
-    savePoolToDB()
-  }
-}, [isSuccess, hash, isSavingToDB])
+  useEffect(() => {
+    if (isSuccess && hash && poolAddress && !isSavingToDB && !hasAttemptedSave.current) {
+      hasAttemptedSave.current = true
+      setIsSavingToDB(true)
+      savePoolToDB()
+    }
+  }, [isSuccess, hash, poolAddress, isSavingToDB])
 
   const savePoolToDB = async () => {
     try {
       if (!address) throw new Error("No wallet address")
+      if (!poolAddress) throw new Error("Pool address not available")
 
       const response = await fetch("/api/pools", {
         method: "POST",
@@ -112,12 +111,13 @@ useEffect(() => {
           description: formData.description || null,
           poolType: "rotational",
           creatorAddress: address,
-          contractAddress: "0x" + Math.random().toString(16).slice(2), // Replace with actual contract address from event
-          tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS,
+          poolAddress: poolAddress,
+          tokenAddress: TOKEN_ADDRESS,
           members: validMembers,
           contributionAmount: formData.contributionAmount,
           roundDuration: frequencyMap[formData.frequency],
           frequency: formData.frequency,
+          txHash: hash,
         }),
       })
 
@@ -128,7 +128,6 @@ useEffect(() => {
       const pool = await response.json()
       setIsSavingToDB(false)
       
-      // Redirect to the new pool
       setTimeout(() => {
         router.push(`/dashboard/group/${pool.id}`)
       }, 1000)

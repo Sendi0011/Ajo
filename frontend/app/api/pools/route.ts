@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       description,
       poolType,
       creatorAddress,
-      contractAddress,
+      poolAddress,
       tokenAddress,
       members,
       contributionAmount,
@@ -21,12 +21,13 @@ export async function POST(req: NextRequest) {
       minimumDeposit,
       withdrawalFee,
       yieldEnabled,
+      txHash,
     } = body
 
     // Validate required fields
-    if (!name || !poolType || !creatorAddress || !contractAddress || !tokenAddress || !members?.length) {
+    if (!name || !poolType || !creatorAddress || !poolAddress || !tokenAddress || !members?.length) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Missing required fields. Need: name, poolType, creatorAddress, poolAddress, tokenAddress, members' },
         { status: 400 }
       )
     }
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
       description,
       poolType,
       creatorAddress,
-      contractAddress,
+      contractAddress: poolAddress,
       tokenAddress,
       members,
       contributionAmount,
@@ -55,6 +56,19 @@ export async function POST(req: NextRequest) {
         { error: result.error || 'Failed to save pool' },
         { status: 500 }
       )
+    }
+
+    // Log the pool creation activity with tx hash
+    if (txHash && result.poolId) {
+      await supabase.from('pool_activity').insert([
+        {
+          pool_id: result.poolId,
+          activity_type: 'pool_created',
+          user_address: creatorAddress.toLowerCase(),
+          description: `${poolType} pool created`,
+          tx_hash: txHash,
+        },
+      ])
     }
 
     return NextResponse.json(result.pool, { status: 201 })
@@ -90,7 +104,8 @@ export async function GET(req: NextRequest) {
             user_address,
             amount,
             description,
-            created_at
+            created_at,
+            tx_hash
           )
         `)
         .eq('id', poolId)

@@ -1,6 +1,6 @@
-
-import { useContractWrite, useWaitForTransactionReceipt } from 'wagmi'
+import { useContractWrite, useWaitForTransactionReceipt, usePublicClient } from 'wagmi'
 import { parseEther } from 'viem'
+import { useEffect, useState } from 'react'
 
 // Import ABIs as const
 const FACTORY_ABI = [
@@ -103,6 +103,38 @@ const ERC20_ABI = [
 
 const FACTORY_ADDRESS = (process.env.NEXT_PUBLIC_FACTORY_ADDRESS || '0x0') as `0x${string}`
 const TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_TOKEN_ADDRESS || '0x0') as `0x${string}`
+
+// Helper to extract pool address from transaction receipt
+async function extractPoolAddress(publicClient: any, txHash: `0x${string}`): Promise<string | null> {
+  try {
+    const receipt = await publicClient.getTransactionReceipt({ hash: txHash })
+    
+    if (!receipt || !receipt.logs || receipt.logs.length === 0) return null
+
+    for (const log of receipt.logs) {
+      try {
+        // Check if this log is from the factory
+        if (log.address.toLowerCase() !== FACTORY_ADDRESS.toLowerCase()) continue
+
+        // The pool address is indexed and appears in topics[1]
+        // Event signature is topics[0], pool address is topics[1], creator is topics[2]
+        if (log.topics.length >= 2) {
+          // Extract address from topic (remove 0x and take last 40 hex chars = 20 bytes)
+          const poolAddr = '0x' + log.topics[1].slice(-40)
+          if (poolAddr.match(/^0x[a-fA-F0-9]{40}$/)) {
+            return poolAddr
+          }
+        }
+      } catch (e) {
+        continue
+      }
+    }
+  } catch (err) {
+    console.error('Failed to extract pool address:', err)
+  }
+  
+  return null
+}
 
 // Approve token spending
 export function useApproveToken(spender: string, amount: string) {
@@ -252,7 +284,7 @@ export function useFlexibleWithdraw(poolAddress: string, amount: string) {
   }
 }
 
-// FACTORY HOOKS
+// FACTORY HOOKS - UPDATED WITH POOL ADDRESS EXTRACTION
 export function useCreateRotational(
   members: string[],
   depositAmount: string,
@@ -274,6 +306,17 @@ export function useCreateRotational(
   const { isLoading: isWaiting, isSuccess } = useWaitForTransactionReceipt({ 
     hash: data 
   })
+  
+  const publicClient = usePublicClient()
+  const [poolAddress, setPoolAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isSuccess && data && publicClient) {
+      extractPoolAddress(publicClient, data).then(addr => {
+        setPoolAddress(addr)
+      })
+    }
+  }, [isSuccess, data, publicClient])
 
   const create = () => {
     writeContract({
@@ -295,6 +338,7 @@ export function useCreateRotational(
     isLoading: isPending || isWaiting,
     isSuccess,
     hash: data,
+    poolAddress,
   }
 }
 
@@ -311,6 +355,17 @@ export function useCreateTarget(
   const { isLoading: isWaiting, isSuccess } = useWaitForTransactionReceipt({ 
     hash: data 
   })
+  
+  const publicClient = usePublicClient()
+  const [poolAddress, setPoolAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isSuccess && data && publicClient) {
+      extractPoolAddress(publicClient, data).then(addr => {
+        setPoolAddress(addr)
+      })
+    }
+  }, [isSuccess, data, publicClient])
 
   const create = () => {
     writeContract({
@@ -331,6 +386,7 @@ export function useCreateTarget(
     isLoading: isPending || isWaiting,
     isSuccess,
     hash: data,
+    poolAddress,
   }
 }
 
@@ -348,6 +404,17 @@ export function useCreateFlexible(
   const { isLoading: isWaiting, isSuccess } = useWaitForTransactionReceipt({ 
     hash: data 
   })
+  
+  const publicClient = usePublicClient()
+  const [poolAddress, setPoolAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isSuccess && data && publicClient) {
+      extractPoolAddress(publicClient, data).then(addr => {
+        setPoolAddress(addr)
+      })
+    }
+  }, [isSuccess, data, publicClient])
 
   const create = () => {
     writeContract({
@@ -369,5 +436,6 @@ export function useCreateFlexible(
     isLoading: isPending || isWaiting,
     isSuccess,
     hash: data,
+    poolAddress,
   }
 }
