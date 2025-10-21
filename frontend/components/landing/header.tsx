@@ -18,7 +18,7 @@ export function Header() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
               <Coins className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">BaseSafe</span>
+            <span className="text-xl font-bold">Ajo</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">

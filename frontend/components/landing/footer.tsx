@@ -11,7 +11,7 @@ export function Footer() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
                 <Coins className="h-6 w-6 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">BaseSafe</span>
+              <span className="text-xl font-bold">Ajo</span>
             </Link>
             <p className="text-muted-foreground max-w-md text-pretty">
               Bringing traditional African savings circles on-chain. Save together, grow together.
