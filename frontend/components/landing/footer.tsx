@@ -74,7 +74,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-border/40 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2025 BaseSafe. Built on Base blockchain.</p>
+          <p className="text-sm text-muted-foreground">© 2025 Ajo. Built on Base blockchain.</p>
           <div className="flex gap-6 text-sm text-muted-foreground">
             <Link href="#" className="hover:text-foreground transition-colors">
               Privacy Policy

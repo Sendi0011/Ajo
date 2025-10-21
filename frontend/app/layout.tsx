@@ -8,9 +8,8 @@ import { Web3Provider } from "@/components/web3-provider"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "BaseSafe - Community Savings on Base",
-  description: "Save together, grow together. Decentralized community savings powered by Base blockchain.",
-  generator: "v0.app",
+  title: "Ajo - Community Savings on Base",
+  description: "Save together, grow together. Decentralized community savings build on Base blockchain.",
 }
 
 export default function RootLayout({
