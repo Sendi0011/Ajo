@@ -11,7 +11,7 @@ export function Hero() {
   const { isConnected } = useAccount()
 
   return (
-    <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-32 overflow-hidden">
+    <section className="relative pt-32 pb-15 sm:pt-40 sm:pb-27 overflow-hidden">
       {/* Background gradient effects */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" />
@@ -52,22 +52,6 @@ export function Hero() {
             <Button size="lg" variant="outline" className="text-lg px-8 h-14 bg-transparent" asChild>
               <Link href="#how-it-works">Learn More</Link>
             </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500">
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">100%</div>
-              <div className="text-sm text-muted-foreground">On-chain Trust</div>
-            </div>
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">0%</div>
-              <div className="text-sm text-muted-foreground">Hidden Fees</div>
-            </div>
-            <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-sm text-muted-foreground">Automated</div>
-            </div>
           </div>
         </div>
       </div>
