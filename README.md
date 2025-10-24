@@ -130,7 +130,7 @@ By combining familiar community savings with blockchain’s automation and trans
 
 ## 🔗 Links  
 
-- **Live App:** [app.ajo.xyz](https://ajo-eight.vercel.app) *()*  
+- **Live App:** [app.ajo.xyz](https://ajo-eight.vercel.app)
 - **GitHub:** [github.com/ajo-onchain](https://github.com/Sendi0011/Ajo)  
 
 ---
