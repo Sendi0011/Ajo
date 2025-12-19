@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useWalletClient, useChainId, useAccount } from "wagmi";
 import { getSmartAccount } from "@/lib/smartAccount";
 import { base, baseSepolia } from "viem/chains";
-import type { BiconomySmartAccountV2 } from "@biconomy/account";
+import type { MeeSmartAccount } from '@biconomy/sdk';
+
 
 export function useSmartAccount() {
   const { data: walletClient } = useWalletClient();
   const chainId = useChainId();
   const { address, isConnected } = useAccount();
-  const [smartAccount, setSmartAccount] = useState<BiconomySmartAccountV2 | null>(null);
+  const [smartAccount, setSmartAccount] = useState<MeeSmartAccount | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | null>(null);

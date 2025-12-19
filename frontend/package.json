@@ -9,6 +9,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@biconomy/paymaster": "^3.1.4",
+    "@biconomy/sdk": "^0.0.29",
     "@emotion/is-prop-valid": "latest",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
