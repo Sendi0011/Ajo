@@ -7,16 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, X, Loader2, AlertCircle } from "lucide-react"
+import { Plus, X, Loader2, AlertCircle, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useAccount } from "wagmi"
-import { useCreateFlexible } from "@/hooks/useBaseSafeContracts"
+import { useUnifiedCreateFlexible, useAccountMode } from "@/hooks/useUnifiedContracts"
+import { WalletModeToggle } from "@/components/wallet-mode-toggle"
 
 const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x408d5D0C25E588875D818f3161b3326D5d18EcAd"
 
 export function FlexibleForm() {
   const router = useRouter()
   const { address } = useAccount()
+  const { isSmartAccountReady } = useAccountMode()
   const [members, setMembers] = useState<string[]>([""])
   const [error, setError] = useState("")
   const [isSavingToDB, setIsSavingToDB] = useState(false)
@@ -30,7 +32,7 @@ export function FlexibleForm() {
 
   const validMembers = members.filter((m) => m && m.startsWith("0x") && m.length === 42)
 
-  const { create, isLoading, isSuccess, hash, poolAddress } = useCreateFlexible(
+  const { create, isLoading, isSuccess, hash, poolAddress } = useUnifiedCreateFlexible(
     validMembers,
     formData.minimumDeposit,
     formData.withdrawalFee,
@@ -131,128 +133,150 @@ export function FlexibleForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="flex gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
-          <AlertCircle className="h-5 w-5 flex-shrink-0" />
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
+    <div className="space-y-6">
+      {/* Wallet Mode Toggle */}
+      <WalletModeToggle />
 
-      <div className="space-y-2">
-        <Label htmlFor="name">Group Name</Label>
-        <Input
-          id="name"
-          placeholder="e.g., Emergency Fund"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="flex gap-2 p-3 rounded-lg bg-destructive/10 text-destructive">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
 
-      <div className="space-y-2">
-        <Label htmlFor="description">Description (Optional)</Label>
-        <Textarea
-          id="description"
-          placeholder="Describe the purpose of this flexible pool"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={3}
-        />
-      </div>
+        {isSmartAccountReady && (
+          <div className="flex gap-2 p-3 rounded-lg bg-primary/10 text-primary border border-primary/20">
+            <Sparkles className="h-5 w-5 flex-shrink-0" />
+            <p className="text-sm">
+              <strong>Gasless Mode Active!</strong> This transaction will be sponsored. No gas fees required.
+            </p>
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="minimum">Minimum Deposit (ETH)</Label>
+          <Label htmlFor="name">Group Name</Label>
           <Input
-            id="minimum"
-            type="number"
-            step="0.01"
-            placeholder="0.1"
-            value={formData.minimumDeposit}
-            onChange={(e) => setFormData({ ...formData, minimumDeposit: e.target.value })}
+            id="name"
+            placeholder="e.g., Emergency Fund"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="fee">Withdrawal Fee (%)</Label>
-          <Input
-            id="fee"
-            type="number"
-            step="0.1"
-            placeholder="1"
-            value={formData.withdrawalFee}
-            onChange={(e) => setFormData({ ...formData, withdrawalFee: e.target.value })}
-            required
+          <Label htmlFor="description">Description (Optional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Describe the purpose of this flexible pool"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows={3}
           />
         </div>
-      </div>
 
-      <div className="flex items-center justify-between p-4 rounded-lg border border-border">
-        <div className="space-y-0.5">
-          <Label htmlFor="yield">Enable Yield Generation</Label>
-          <p className="text-sm text-muted-foreground">Stake idle funds in Base DeFi protocols for passive income</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="minimum">Minimum Deposit (ETH)</Label>
+            <Input
+              id="minimum"
+              type="number"
+              step="0.01"
+              placeholder="0.1"
+              value={formData.minimumDeposit}
+              onChange={(e) => setFormData({ ...formData, minimumDeposit: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fee">Withdrawal Fee (%)</Label>
+            <Input
+              id="fee"
+              type="number"
+              step="0.1"
+              placeholder="1"
+              value={formData.withdrawalFee}
+              onChange={(e) => setFormData({ ...formData, withdrawalFee: e.target.value })}
+              required
+            />
+          </div>
         </div>
-        <input
-          id="yield"
-          type="checkbox"
-          checked={formData.enableYield}
-          onChange={(e) => setFormData({ ...formData, enableYield: e.target.checked })}
-          className="h-4 w-4 rounded"
-        />
-      </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label>Member Wallet Addresses</Label>
-          <Button type="button" variant="outline" size="sm" onClick={addMember}>
-            <Plus className="h-4 w-4 mr-1" />
-            Add Member
-          </Button>
+        <div className="flex items-center justify-between p-4 rounded-lg border border-border">
+          <div className="space-y-0.5">
+            <Label htmlFor="yield">Enable Yield Generation</Label>
+            <p className="text-sm text-muted-foreground">Stake idle funds in Base DeFi protocols for passive income</p>
+          </div>
+          <input
+            id="yield"
+            type="checkbox"
+            checked={formData.enableYield}
+            onChange={(e) => setFormData({ ...formData, enableYield: e.target.checked })}
+            className="h-4 w-4 rounded"
+          />
         </div>
 
-        <div className="space-y-3">
-          {members.map((member, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                placeholder="0x..."
-                value={member}
-                onChange={(e) => updateMember(index, e.target.value)}
-              />
-              {members.length > 1 && (
-                <Button type="button" variant="ghost" size="icon" onClick={() => removeMember(index)}>
-                  <X className="h-4 w-4" />
-                </Button>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Member Wallet Addresses</Label>
+            <Button type="button" variant="outline" size="sm" onClick={addMember}>
+              <Plus className="h-4 w-4 mr-1" />
+              Add Member
+            </Button>
+          </div>
+
+          <div className="space-y-3">
+            {members.map((member, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  placeholder="0x..."
+                  value={member}
+                  onChange={(e) => updateMember(index, e.target.value)}
+                />
+                {members.length > 1 && (
+                  <Button type="button" variant="ghost" size="icon" onClick={() => removeMember(index)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-border">
+          <div className="bg-muted/30 rounded-lg p-4 mb-6">
+            <h4 className="font-semibold mb-2">Summary</h4>
+            <ul className="space-y-1 text-sm text-muted-foreground">
+              <li>Total Members: {validMembers.length}</li>
+              <li>Minimum Deposit: {formData.minimumDeposit || "0"} ETH</li>
+              <li>Withdrawal Fee: {formData.withdrawalFee}%</li>
+              <li>Yield Generation: {formData.enableYield ? "Enabled" : "Disabled"}</li>
+              {isSmartAccountReady && (
+                <li className="text-primary font-semibold">
+                  ⚡ Gas Fees: Sponsored (FREE)
+                </li>
               )}
-            </div>
-          ))}
-        </div>
-      </div>
+            </ul>
+          </div>
 
-      <div className="pt-6 border-t border-border">
-        <div className="bg-muted/30 rounded-lg p-4 mb-6">
-          <h4 className="font-semibold mb-2">Summary</h4>
-          <ul className="space-y-1 text-sm text-muted-foreground">
-            <li>Total Members: {validMembers.length}</li>
-            <li>Minimum Deposit: {formData.minimumDeposit || "0"} ETH</li>
-            <li>Withdrawal Fee: {formData.withdrawalFee}%</li>
-            <li>Yield Generation: {formData.enableYield ? "Enabled" : "Disabled"}</li>
-          </ul>
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || isSavingToDB}>
+            {isLoading || isSavingToDB ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {isSavingToDB ? "Saving to database..." : "Creating Group..."}
+              </>
+            ) : (
+              <>
+                {isSmartAccountReady && <Sparkles className="mr-2 h-4 w-4" />}
+                Create Flexible Pool {isSmartAccountReady && "(Gasless)"}
+              </>
+            )}
+          </Button>
+          {hash && <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>}
         </div>
-
-        <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading || isSavingToDB}>
-          {isLoading || isSavingToDB ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {isSavingToDB ? "Saving to database..." : "Creating Group..."}
-            </>
-          ) : (
-            "Create Flexible Pool"
-          )}
-        </Button>
-        {hash && <p className="text-xs text-green-600 mt-2">TX: {hash.slice(0, 20)}...</p>}
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }
