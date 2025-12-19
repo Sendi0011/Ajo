@@ -41,3 +41,18 @@ export async function getSmartAccount(
   }
 }
 
+// Helper to get smart account address
+export async function getSmartAccountAddress(
+  walletClient: WalletClient,
+  chainId: number
+): Promise<string | null> {
+  try {
+    const smartAccount = await getSmartAccount(walletClient, chainId);
+    if (!smartAccount) return null;
+    
+    return await smartAccount.getAccountAddress();
+  } catch (error) {
+    console.error("Error getting smart account address:", error);
+    return null;
+  }
+}
