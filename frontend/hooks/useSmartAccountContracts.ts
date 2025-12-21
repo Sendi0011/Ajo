@@ -160,21 +160,21 @@ export function useSmartApproveToken(spender: string, amount: string) {
         args: [spender as Address, parsedAmount],
       })
 
-      // Fix: Use buildUserOp and sendUserOp pattern
-      const userOp = await smartAccount.buildUserOp([
+      // Use the sendTransaction method from MeeSmartAccount
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        TOKEN_ADDRESS,
+        data,
         {
-          to: TOKEN_ADDRESS,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
       
       // Wait for confirmation
-      await userOpResponse.wait()
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Approve error:', err)
@@ -216,18 +216,18 @@ export function useSmartRotationalDeposit(poolAddress: string) {
         functionName: 'deposit',
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        poolAddress as Address,
+        data,
         {
-          to: poolAddress as Address,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
-      await userOpResponse.wait()
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Deposit error:', err)
@@ -272,18 +272,18 @@ export function useSmartTargetContribute(poolAddress: string, amount: string) {
         args: [parsedAmount],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        poolAddress as Address,
+        data,
         {
-          to: poolAddress as Address,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
-      await userOpResponse.wait()
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Contribute error:', err)
@@ -324,18 +324,18 @@ export function useSmartTargetWithdraw(poolAddress: string) {
         functionName: 'withdraw',
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        poolAddress as Address,
+        data,
         {
-          to: poolAddress as Address,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
-      await userOpResponse.wait()
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Withdraw error:', err)
@@ -380,18 +380,18 @@ export function useSmartFlexibleDeposit(poolAddress: string, amount: string) {
         args: [parsedAmount],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        poolAddress as Address,
+        data,
         {
-          to: poolAddress as Address,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
-      await userOpResponse.wait()
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Deposit error:', err)
@@ -435,18 +435,18 @@ export function useSmartFlexibleWithdraw(poolAddress: string, amount: string) {
         args: [parsedAmount],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        poolAddress as Address,
+        data,
         {
-          to: poolAddress as Address,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
-      await userOpResponse.wait()
+      setHash(userOpResponse.userOpHash || userOpResponse.hash)
+      if (userOpResponse.wait) {
+        await userOpResponse.wait()
+      }
       setIsSuccess(true)
     } catch (err: any) {
       console.error('Withdraw error:', err)
@@ -513,20 +513,19 @@ export function useSmartCreateRotational(
         ],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        FACTORY_ADDRESS,
+        data,
         {
-          to: FACTORY_ADDRESS,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
+      const txHash = userOpResponse.userOpHash || userOpResponse.hash
+      setHash(txHash)
       
       // Extract pool address from receipt
-      const addr = await extractPoolAddress(smartAccount, userOpResponse.userOpHash)
+      const addr = await extractPoolAddress(smartAccount, txHash)
       setPoolAddress(addr)
       
       setIsSuccess(true)
@@ -585,19 +584,18 @@ export function useSmartCreateTarget(
         ],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        FACTORY_ADDRESS,
+        data,
         {
-          to: FACTORY_ADDRESS,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
+      const txHash = userOpResponse.userOpHash || userOpResponse.hash
+      setHash(txHash)
       
-      const addr = await extractPoolAddress(smartAccount, userOpResponse.userOpHash)
+      const addr = await extractPoolAddress(smartAccount, txHash)
       setPoolAddress(addr)
       
       setIsSuccess(true)
@@ -658,19 +656,18 @@ export function useSmartCreateFlexible(
         ],
       })
 
-      const userOp = await smartAccount.buildUserOp([
+      const userOpResponse = await (smartAccount as any).sendTransaction(
+        FACTORY_ADDRESS,
+        data,
         {
-          to: FACTORY_ADDRESS,
-          data,
+          paymasterServiceData: { mode: PaymasterMode.SPONSORED },
         }
-      ], {
-        paymasterServiceData: { mode: PaymasterMode.SPONSORED },
-      })
+      )
 
-      const userOpResponse = await smartAccount.sendUserOp(userOp)
-      setHash(userOpResponse.userOpHash)
+      const txHash = userOpResponse.userOpHash || userOpResponse.hash
+      setHash(txHash)
       
-      const addr = await extractPoolAddress(smartAccount, userOpResponse.userOpHash)
+      const addr = await extractPoolAddress(smartAccount, txHash)
       setPoolAddress(addr)
       
       setIsSuccess(true)
