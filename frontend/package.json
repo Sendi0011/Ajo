@@ -9,6 +9,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@biconomy/account": "^4.5.7",
+    "@biconomy/bundler": "^3.1.4",
+    "@biconomy/modules": "^3.1.4",
     "@biconomy/paymaster": "^3.1.4",
     "@biconomy/sdk": "^0.0.29",
     "@emotion/is-prop-valid": "latest",
