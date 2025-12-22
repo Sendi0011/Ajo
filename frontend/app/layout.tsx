@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Web3Provider } from "@/components/web3-provider"
+import { Toaster } from "@/components/ui/sonner"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -21,7 +22,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={null}>
-          <Web3Provider>{children}</Web3Provider>
+          <Web3Provider>
+            {children}
+            {/* Add Toaster for notifications */}
+            <Toaster position="top-right" />
+          </Web3Provider>
         </Suspense>
         <Analytics />
       </body>
