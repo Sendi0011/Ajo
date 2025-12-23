@@ -44,7 +44,7 @@
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
     "@react-native-async-storage/async-storage": "^1.24.0",
-    "@reown/appkit": "latest",
+    "@reown/appkit": "^1.8.15",
     "@reown/appkit-adapter-wagmi": "latest",
     "@supabase/supabase-js": "^2.75.1",
     "@tanstack/react-query": "latest",
