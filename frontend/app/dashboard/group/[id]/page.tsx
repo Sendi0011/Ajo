@@ -61,6 +61,7 @@ export default function GroupPage({ params }: { params: Promise<{ id: string }> 
               poolAddress={pool.contract_address}
               poolType={pool.type}
               tokenAddress={pool.token_address}
+              totalMembers={0}
             />
             <GroupMembers groupId={id} />
           </div>
