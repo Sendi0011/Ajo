@@ -203,3 +203,25 @@ function calculateMonthlyStats(activities: any[]) {
     }))
 }
 
+// Helper: Calculate performance metrics
+function calculatePerformanceMetrics(activities: any[], monthlyStats: any[]) {
+  const deposits = activities.filter(
+    (a) => a.activity_type === 'deposit' || a.activity_type === 'contribution'
+  )
+
+  const monthlyTotals = monthlyStats.map((m) => ({
+    month: m.month,
+    amount: m.deposits,
+  }))
+
+  const bestMonth = monthlyTotals.reduce(
+    (best, current) => (current.amount > best.amount ? current : best),
+    { month: 'N/A', amount: 0 }
+  )
+
+  const averageMonthly =
+    monthlyTotals.reduce((sum, m) => sum + m.amount, 0) / (monthlyTotals.length || 1)
+
+  const projectedYearly = averageMonthly * 12
+
+  
