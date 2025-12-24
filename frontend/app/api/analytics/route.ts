@@ -224,4 +224,32 @@ function calculatePerformanceMetrics(activities: any[], monthlyStats: any[]) {
 
   const projectedYearly = averageMonthly * 12
 
-  
+  // Calculate growth rate (comparing last month to average)
+  const lastMonth = monthlyTotals[monthlyTotals.length - 1]?.amount || 0
+  const growthRate = averageMonthly
+    ? ((lastMonth - averageMonthly) / averageMonthly) * 100
+    : 0
+
+  return {
+    bestMonth,
+    averageMonthly,
+    projectedYearly,
+    growthRate,
+  }
+}
+
+// Helper: Format date based on timeframe
+function formatDate(dateString: string, timeframe: string): string {
+  const date = new Date(dateString)
+  switch (timeframe) {
+    case 'week':
+      return date.toLocaleDateString('en-US', { weekday: 'short' })
+    case 'month':
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    case 'year':
+      return date.toLocaleDateString('en-US', { month: 'short' })
+    default:
+      return dateString
+  }
+}
+
