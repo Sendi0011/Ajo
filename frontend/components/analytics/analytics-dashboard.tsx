@@ -244,7 +244,120 @@ function StatCard({
             </div>
           </div>
     
-          
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              title="Total Saved"
+              value={`${overview.totalSaved.toFixed(2)} ETH`}
+              subtitle={`≈ $${(overview.totalSaved * 2500).toFixed(0)}`}
+              icon={DollarSign}
+              trend="up"
+              trendValue={`${performanceMetrics.growthRate.toFixed(1)}%`}
+              color="green"
+            />
+            <StatCard
+              title="Active Pools"
+              value={overview.activePoolsCount}
+              subtitle={`${overview.completedPoolsCount} completed`}
+              icon={Users}
+              color="blue"
+            />
+            <StatCard
+              title="On-Time Rate"
+              value={`${overview.onTimePaymentRate}%`}
+              subtitle="Payment reliability"
+              icon={CheckCircle}
+              trend={overview.onTimePaymentRate >= 90 ? "up" : "down"}
+              trendValue={overview.onTimePaymentRate >= 90 ? "Excellent" : "Needs improvement"}
+              color={overview.onTimePaymentRate >= 90 ? "green" : "orange"}
+            />
+            <StatCard
+              title="Reputation Score"
+              value={overview.reputationScore}
+              subtitle={
+                overview.reputationScore >= 90
+                  ? "🏆 Diamond"
+                  : overview.reputationScore >= 75
+                  ? "🥇 Gold"
+                  : "🥈 Silver"
+              }
+              icon={Award}
+              color="purple"
+            />
+          </div>
+    
+          {/* Main Charts */}
+          <Tabs defaultValue="trends" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="trends">Savings Trends</TabsTrigger>
+              <TabsTrigger value="pools">Pool Breakdown</TabsTrigger>
+              <TabsTrigger value="monthly">Monthly Analysis</TabsTrigger>
+              <TabsTrigger value="performance">Performance</TabsTrigger>
+            </TabsList>
+    
+            {/* Savings Trends */}
+            <TabsContent value="trends" className="space-y-4">
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold">Savings Growth</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your cumulative savings over time
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={timeframe === "week" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeframe("week")}
+                    >
+                      Week
+                    </Button>
+                    <Button
+                      variant={timeframe === "month" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeframe("month")}
+                    >
+                      Month
+                    </Button>
+                    <Button
+                      variant={timeframe === "year" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeframe("year")}
+                    >
+                      Year
+                    </Button>
+                  </div>
+                </div>
+    
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={savingsTrend}>
+                    <defs>
+                      <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="date" stroke="#9ca3af" />
+                    <YAxis stroke="#9ca3af" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#1f2937",
+                        border: "1px solid #374151",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="cumulative"
+                      stroke="#3b82f6"
+                      fillOpacity={1}
+                      fill="url(#colorAmount)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
     
               {/* Key Insights */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
