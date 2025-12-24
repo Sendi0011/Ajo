@@ -174,3 +174,32 @@ function calculateSavingsTrend(activities: any[], timeframe: string) {
   }))
 }
 
+// Helper: Calculate monthly stats
+function calculateMonthlyStats(activities: any[]) {
+  const monthlyData: Record<string, { deposits: number; withdrawals: number }> = {}
+
+  activities.forEach((activity) => {
+    const month = new Date(activity.created_at).toISOString().slice(0, 7) // YYYY-MM
+    if (!monthlyData[month]) {
+      monthlyData[month] = { deposits: 0, withdrawals: 0 }
+    }
+
+    const amount = activity.amount || 0
+    if (activity.activity_type === 'deposit' || activity.activity_type === 'contribution') {
+      monthlyData[month].deposits += amount
+    } else if (activity.activity_type === 'withdrawal') {
+      monthlyData[month].withdrawals += amount
+    }
+  })
+
+  return Object.entries(monthlyData)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6) // Last 6 months
+    .map(([month, data]) => ({
+      month: formatMonth(month),
+      deposits: data.deposits,
+      withdrawals: data.withdrawals,
+      net: data.deposits - data.withdrawals,
+    }))
+}
+
