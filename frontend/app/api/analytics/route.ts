@@ -46,4 +46,35 @@ export async function GET(req: NextRequest) {
 
     if (activitiesError) throw activitiesError
 
+    // Calculate overview stats
+    const activePoolsCount = userPools?.filter(
+      (p) => p.pools?.status === 'active'
+    ).length || 0
+
+    const completedPoolsCount = userPools?.filter(
+      (p) => p.pools?.status === 'completed'
+    ).length || 0
+
+    const totalSaved = userPools?.reduce((sum, p) => {
+      return sum + (p.pools?.total_saved || 0)
+    }, 0) || 0
+
+    const totalContributions = activities?.filter(
+      (a) => a.activity_type === 'deposit' || a.activity_type === 'contribution'
+    ).length || 0
+
+    const onTimeContributions = userPools?.filter(
+      (p) => p.status === 'paid'
+    ).length || 0
+
+    const totalExpectedContributions = userPools?.length || 1
+
+    const onTimePaymentRate = Math.round(
+      (onTimeContributions / totalExpectedContributions) * 100
+    )
+
+    const emergencyWithdrawals = activities?.filter(
+      (a) => a.activity_type === 'emergency_executed'
+    ).length || 0
+
     
