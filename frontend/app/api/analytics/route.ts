@@ -253,3 +253,9 @@ function formatDate(dateString: string, timeframe: string): string {
   }
 }
 
+// Helper: Format month
+function formatMonth(monthString: string): string {
+  const [year, month] = monthString.split('-')
+  const date = new Date(parseInt(year), parseInt(month) - 1)
+  return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+}
