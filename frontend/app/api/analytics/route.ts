@@ -69,5 +69,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// Generate CSV
+function generateCSV(activities: any[], pools: any[], userAddress: string): string {
+  const lines: string[] = []
 
+  // Header
+  lines.push(`Ajo Analytics Report`)
+  lines.push(`Generated: ${new Date().toLocaleDateString()}`)
+  lines.push(`User: ${userAddress}`)
+  lines.push(``)
+
+  
 }
