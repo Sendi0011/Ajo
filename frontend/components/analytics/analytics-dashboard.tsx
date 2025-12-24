@@ -81,3 +81,31 @@ interface AnalyticsData {
   }
 }
 
+// Stat Card Component
+function StatCard({
+    title,
+    value,
+    subtitle,
+    icon: Icon,
+    trend,
+    trendValue,
+    color = "blue",
+  }: {
+    title: string
+    value: string | number
+    subtitle?: string
+    icon: any
+    trend?: "up" | "down"
+    trendValue?: string
+    color?: string
+  }) {
+    const colorClasses = {
+      blue: "bg-blue-500/10 text-blue-600",
+      green: "bg-green-500/10 text-green-600",
+      purple: "bg-purple-500/10 text-purple-600",
+      orange: "bg-orange-500/10 text-orange-600",
+      red: "bg-red-500/10 text-red-600",
+    }
+  
+    
+  }
