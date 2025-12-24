@@ -77,4 +77,11 @@ export async function GET(req: NextRequest) {
       (a) => a.activity_type === 'emergency_executed'
     ).length || 0
 
+    // Calculate reputation score
+    let reputationScore = 50 // Base score
+    reputationScore += Math.min(onTimePaymentRate * 0.4, 40) // Up to 40 points for on-time
+    reputationScore += Math.min(completedPoolsCount * 2, 20) // Up to 20 points for completed pools
+    reputationScore -= emergencyWithdrawals * 5 // Minus 5 points per emergency
+    reputationScore = Math.max(0, Math.min(100, reputationScore)) // Clamp between 0-100
+
     
