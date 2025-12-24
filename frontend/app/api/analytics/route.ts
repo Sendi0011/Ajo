@@ -84,4 +84,48 @@ export async function GET(req: NextRequest) {
     reputationScore -= emergencyWithdrawals * 5 // Minus 5 points per emergency
     reputationScore = Math.max(0, Math.min(100, reputationScore)) // Clamp between 0-100
 
-    
+    // Calculate savings trend based on timeframe
+    const savingsTrend = calculateSavingsTrend(activities, timeframe)
+
+    // Pool breakdown
+    const poolBreakdown = userPools?.map((p) => ({
+      name: p.pools?.name || 'Unknown Pool',
+      type: p.pools?.type || 'unknown',
+      amount: p.contribution_amount || 0,
+      progress: p.pools?.progress || 0,
+      status: p.pools?.status || 'unknown',
+    })) || []
+
+    // Monthly stats
+    const monthlyStats = calculateMonthlyStats(activities)
+
+    // Performance metrics
+    const performanceMetrics = calculatePerformanceMetrics(activities, monthlyStats)
+
+    const overview = {
+      totalSaved,
+      activePoolsCount,
+      completedPoolsCount,
+      onTimePaymentRate,
+      totalContributions,
+      averagePoolSize: userPools?.length ? totalSaved / userPools.length : 0,
+      emergencyWithdrawals,
+      reputationScore: Math.round(reputationScore),
+    }
+
+    return NextResponse.json({
+      overview,
+      savingsTrend,
+      poolBreakdown,
+      monthlyStats,
+      performanceMetrics,
+    })
+  } catch (error) {
+    console.error('Analytics fetch error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
