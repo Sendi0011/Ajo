@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -79,5 +80,32 @@ function generateCSV(activities: any[], pools: any[], userAddress: string): stri
   lines.push(`User: ${userAddress}`)
   lines.push(``)
 
-  
+  // Pools Summary
+  lines.push(`Pool Summary`)
+  lines.push(`Pool Name,Type,Status,Total Saved,Target,Progress`)
+  pools?.forEach((p) => {
+    const pool = p.pools
+    lines.push(
+      `"${pool.name}",${pool.type},${pool.status},${pool.total_saved || 0},${pool.target_amount || 'N/A'},${pool.progress || 0}%`
+    )
+  })
+  lines.push(``)
+
+  // Activities
+  lines.push(`Activity History`)
+  lines.push(`Date,Pool,Activity Type,Amount,Description`)
+  activities?.forEach((a) => {
+    const pool = a.pools?.name || 'Unknown'
+    const date = new Date(a.created_at).toLocaleDateString()
+    const amount = a.amount ? `${a.amount} ETH` : 'N/A'
+    const description = a.description || ''
+    lines.push(
+      `${date},"${pool}",${a.activity_type},${amount},"${description}"`
+    )
+  })
+
+  return lines.join('\n')
+}
+
+
 }
