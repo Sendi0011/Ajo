@@ -216,3 +216,12 @@ function PaymentCard({
   )
 }
 
+// Helper function to calculate time progress
+function getTimeProgress(dueDate: Date): number {
+  const now = new Date().getTime()
+  const due = dueDate.getTime()
+  const total = 7 * 24 * 60 * 60 * 1000 // 7 days in ms
+  const elapsed = total - (due - now)
+  return Math.min(100, Math.max(0, (elapsed / total) * 100))
+}
+
