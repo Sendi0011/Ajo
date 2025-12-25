@@ -468,3 +468,175 @@ function ReminderSettings({
   )
 }
 
+// Main Calendar & Reminders Component
+export function CalendarReminders() {
+  const { address } = useAccount()
+  const { data: balanceData } = useBalance({ address })
+  const [payments, setPayments] = useState<Payment[]>([])
+  const [loading, setLoading] = useState(true)
+  const [preferences, setPreferences] = useState<ReminderPreferences>({
+    enabled: true,
+    threeDaysBefore: true,
+    oneDayBefore: true,
+    twoHoursBefore: true,
+    thirtyMinsBefore: false,
+    balanceCheck: true,
+    browserNotifications: true,
+    emailNotifications: false,
+  })
+
+  const walletBalance = balanceData ? parseFloat(formatEther(balanceData.value)) : 0
+
+  useEffect(() => {
+    if (address) {
+      fetchPayments()
+      loadPreferences()
+    }
+  }, [address])
+
+  const fetchPayments = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/calendar/payments?userAddress=${address}`)
+      if (response.ok) {
+        const data = await response.json()
+        setPayments(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch payments:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadPreferences = () => {
+    const saved = localStorage.getItem("reminder-preferences")
+    if (saved) {
+      setPreferences(JSON.parse(saved))
+    }
+  }
+
+  const savePreferences = (prefs: ReminderPreferences) => {
+    setPreferences(prefs)
+    localStorage.setItem("reminder-preferences", JSON.stringify(prefs))
+    toast.success("Reminder preferences saved")
+
+    if (prefs.browserNotifications && Notification.permission === "default") {
+      Notification.requestPermission()
+    }
+  }
+
+  const handlePay = (payment: Payment) => {
+    // Navigate to pool page with auto-open payment modal
+    window.location.href = `/dashboard/group/${payment.poolId}?action=pay`
+  }
+
+  const handleSnooze = (payment: Payment) => {
+    toast.info(`Reminder snoozed for 1 hour`)
+    // Implement snooze logic
+  }
+
+  const upcomingPayments = payments.filter((p) => !p.hasPaid).slice(0, 5)
+  const overduePayments = payments.filter((p) => p.status === "overdue")
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-6">
+            <div className="h-32 bg-muted animate-pulse rounded" />
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold">Calendar & Reminders</h2>
+          <p className="text-muted-foreground">Never miss a payment deadline</p>
+        </div>
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+          <Wallet className="h-5 w-5" />
+          <div>
+            <p className="text-sm text-muted-foreground">Wallet Balance</p>
+            <p className="font-semibold">{walletBalance.toFixed(4)} ETH</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Overdue Alert */}
+      {overduePayments.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="p-4 border-2 border-red-500 bg-red-50 dark:bg-red-950">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-red-600">
+                  {overduePayments.length} Overdue Payment{overduePayments.length > 1 ? "s" : ""}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Please make these payments as soon as possible to avoid penalties
+                </p>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Main Content */}
+      <Tabs defaultValue="upcoming" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="upcoming">
+            Upcoming ({upcomingPayments.length})
+          </TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+
+        {/* Upcoming Payments */}
+        <TabsContent value="upcoming" className="space-y-4">
+          {upcomingPayments.length === 0 ? (
+            <Card className="p-12">
+              <div className="text-center">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-600" />
+                <h3 className="text-lg font-semibold mb-2">All Caught Up!</h3>
+                <p className="text-sm text-muted-foreground">
+                  No upcoming payments in the next 7 days
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <AnimatePresence>
+              {upcomingPayments.map((payment) => (
+                <PaymentCard
+                  key={payment.id}
+                  payment={payment}
+                  walletBalance={walletBalance}
+                  onPay={handlePay}
+                  onSnooze={handleSnooze}
+                />
+              ))}
+            </AnimatePresence>
+          )}
+        </TabsContent>
+
+        {/* Calendar View */}
+        <TabsContent value="calendar">
+          <CalendarView payments={payments} />
+        </TabsContent>
+
+        {/* Settings */}
+        <TabsContent value="settings">
+          <ReminderSettings preferences={preferences} onSave={savePreferences} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
