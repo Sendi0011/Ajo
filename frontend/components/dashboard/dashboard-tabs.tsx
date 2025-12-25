@@ -7,6 +7,7 @@ import { CreateGroup } from "@/components/dashboard/create-group";
 import { Transactions } from "@/components/dashboard/transactions";
 import { Profile } from "@/components/dashboard/profile";
 import { Home, PlusCircle, Receipt, User } from "lucide-react";
+import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import { BarChart3 } from "lucide-react";
 
