@@ -348,3 +348,123 @@ function CalendarView({ payments }: { payments: Payment[] }) {
   )
 }
 
+// Reminder Preferences Component
+function ReminderSettings({
+  preferences,
+  onSave,
+}: {
+  preferences: ReminderPreferences
+  onSave: (prefs: ReminderPreferences) => void
+}) {
+  const [localPrefs, setLocalPrefs] = useState(preferences)
+
+  return (
+    <Card className="p-6">
+      <h3 className="text-lg font-semibold mb-4">Reminder Preferences</h3>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="enable-reminders" className="flex flex-col gap-1">
+            <span>Enable Reminders</span>
+            <span className="text-xs text-muted-foreground font-normal">
+              Get notified before payment deadlines
+            </span>
+          </Label>
+          <Switch
+            id="enable-reminders"
+            checked={localPrefs.enabled}
+            onCheckedChange={(checked) =>
+              setLocalPrefs({ ...localPrefs, enabled: checked })
+            }
+          />
+        </div>
+
+        {localPrefs.enabled && (
+          <>
+            <div className="pl-4 space-y-4 border-l-2 border-primary/20">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="3days">3 days before</Label>
+                <Switch
+                  id="3days"
+                  checked={localPrefs.threeDaysBefore}
+                  onCheckedChange={(checked) =>
+                    setLocalPrefs({ ...localPrefs, threeDaysBefore: checked })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="1day">1 day before</Label>
+                <Switch
+                  id="1day"
+                  checked={localPrefs.oneDayBefore}
+                  onCheckedChange={(checked) =>
+                    setLocalPrefs({ ...localPrefs, oneDayBefore: checked })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="2hours">2 hours before</Label>
+                <Switch
+                  id="2hours"
+                  checked={localPrefs.twoHoursBefore}
+                  onCheckedChange={(checked) =>
+                    setLocalPrefs({ ...localPrefs, twoHoursBefore: checked })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="30mins">30 minutes before</Label>
+                <Switch
+                  id="30mins"
+                  checked={localPrefs.thirtyMinsBefore}
+                  onCheckedChange={(checked) =>
+                    setLocalPrefs({ ...localPrefs, thirtyMinsBefore: checked })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t">
+              <Label htmlFor="balance-check" className="flex flex-col gap-1">
+                <span>Balance Check</span>
+                <span className="text-xs text-muted-foreground font-normal">
+                  Warn if insufficient funds
+                </span>
+              </Label>
+              <Switch
+                id="balance-check"
+                checked={localPrefs.balanceCheck}
+                onCheckedChange={(checked) =>
+                  setLocalPrefs({ ...localPrefs, balanceCheck: checked })
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="browser-notif" className="flex flex-col gap-1">
+                <span>Browser Notifications</span>
+                <span className="text-xs text-muted-foreground font-normal">
+                  Show desktop notifications
+                </span>
+              </Label>
+              <Switch
+                id="browser-notif"
+                checked={localPrefs.browserNotifications}
+                onCheckedChange={(checked) =>
+                  setLocalPrefs({ ...localPrefs, browserNotifications: checked })
+                }
+              />
+            </div>
+          </>
+        )}
+
+        <Button onClick={() => onSave(localPrefs)} className="w-full">
+          Save Preferences
+        </Button>
+      </div>
+    </Card>
+  )
+}
+
