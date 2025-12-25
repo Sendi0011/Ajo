@@ -93,5 +93,55 @@ interface ReminderPreferences {
       }
     }
   
-    
+    // Send a reminder notification
+    private sendReminder(payment: any, message: string, prefs: ReminderPreferences) {
+      // Browser notification
+      if (prefs.browserNotifications && Notification.permission === 'granted') {
+        new Notification('Ajo Payment Reminder', {
+          body: message,
+          icon: '/logo.png',
+          tag: `payment-${payment.id}`,
+          requireInteraction: true,
+        })
+      }
+  
+      // In-app notification (using toast)
+      if (typeof window !== 'undefined') {
+        const toast = (window as any).toast
+        if (toast) {
+          toast.info(message, {
+            duration: 10000,
+            action: {
+              label: 'Pay Now',
+              onClick: () => {
+                window.location.href = `/dashboard/group/${payment.poolId}?action=pay`
+              },
+            },
+          })
+        }
+      }
+  
+      // Store notification in database
+      this.storeNotification(payment, message)
+    }
+  
+    // Store notification in database for history
+    private async storeNotification(payment: any, message: string) {
+      try {
+        await fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userAddress: localStorage.getItem('user-address'),
+            poolId: payment.poolId,
+            type: 'payment_reminder',
+            title: 'Payment Reminder',
+            message,
+            actionUrl: `/dashboard/group/${payment.poolId}`,
+          }),
+        })
+      } catch (error) {
+        console.error('Failed to store notification:', error)
+      }
+    }
   }
