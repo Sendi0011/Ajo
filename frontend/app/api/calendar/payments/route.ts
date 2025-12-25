@@ -139,3 +139,29 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// POST - Mark payment as snoozed (store reminder for later)
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { userAddress, paymentId, snoozeUntil } = body
+
+    if (!userAddress || !paymentId) {
+      return NextResponse.json(
+        { error: 'userAddress and paymentId are required' },
+        { status: 400 }
+      )
+    }
+
+    // Store snooze preference in localStorage or database
+    // For now, we'll just return success
+    // In production, you might want to store this in a reminders table
+
+    return NextResponse.json({ success: true, snoozeUntil })
+  } catch (error) {
+    console.error('Snooze payment error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
