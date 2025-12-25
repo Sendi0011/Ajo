@@ -75,5 +75,66 @@ export function UpcomingPaymentsWidget() {
     )
   }
 
-  
+  return (
+    <Card className="p-4">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="font-semibold text-sm flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Upcoming Payments
+          </h4>
+          {payments.length > 0 && (
+            <Badge variant="secondary" className="text-xs">
+              {payments.length}
+            </Badge>
+          )}
+        </div>
+
+        {payments.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">
+            No upcoming payments
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {payments.map((payment) => (
+              <div
+                key={payment.id}
+                className="p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">
+                      {payment.poolName}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {payment.amount.toFixed(2)} ETH
+                    </p>
+                  </div>
+                  {payment.status === "overdue" && (
+                    <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className={getStatusColor(payment.status)}>
+                    <Clock className="h-3 w-3 inline mr-1" />
+                    {getTimeUntil(payment.dueDate)}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {new Date(payment.dueDate).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Link href="/dashboard/calendar">
+          <Button variant="ghost" className="w-full" size="sm">
+            View All
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
+        </Link>
+      </div>
+    </Card>
+  )
 }
