@@ -225,3 +225,126 @@ function getTimeProgress(dueDate: Date): number {
   return Math.min(100, Math.max(0, (elapsed / total) * 100))
 }
 
+// Calendar View Component
+function CalendarView({ payments }: { payments: Payment[] }) {
+  const [currentDate, setCurrentDate] = useState(new Date())
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const daysInMonth = lastDay.getDate()
+    const startingDayOfWeek = firstDay.getDay()
+
+    return { daysInMonth, startingDayOfWeek }
+  }
+
+  const getPaymentsForDay = (day: number) => {
+    return payments.filter((p) => {
+      const paymentDate = new Date(p.dueDate)
+      return (
+        paymentDate.getDate() === day &&
+        paymentDate.getMonth() === currentDate.getMonth() &&
+        paymentDate.getFullYear() === currentDate.getFullYear()
+      )
+    })
+  }
+
+  const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentDate)
+
+  const previousMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))
+  }
+
+  const nextMonth = () => {
+    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))
+  }
+
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+  return (
+    <Card className="p-6">
+      {/* Calendar Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">
+          {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        </h3>
+        <div className="flex gap-2">
+          <Button variant="outline" size="icon" onClick={previousMonth}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+            Today
+          </Button>
+          <Button variant="outline" size="icon" onClick={nextMonth}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-2">
+        {/* Week day headers */}
+        {weekDays.map((day) => (
+          <div
+            key={day}
+            className="text-center text-sm font-medium text-muted-foreground py-2"
+          >
+            {day}
+          </div>
+        ))}
+
+        {/* Empty cells for days before month starts */}
+        {Array.from({ length: startingDayOfWeek }).map((_, i) => (
+          <div key={`empty-${i}`} className="aspect-square" />
+        ))}
+
+        {/* Calendar days */}
+        {Array.from({ length: daysInMonth }).map((_, i) => {
+          const day = i + 1
+          const dayPayments = getPaymentsForDay(day)
+          const isToday =
+            day === new Date().getDate() &&
+            currentDate.getMonth() === new Date().getMonth() &&
+            currentDate.getFullYear() === new Date().getFullYear()
+
+          return (
+            <div
+              key={day}
+              className={`aspect-square p-2 border rounded-lg relative ${
+                isToday ? "border-primary bg-primary/5" : "border-border"
+              } ${dayPayments.length > 0 ? "cursor-pointer hover:bg-muted/50" : ""}`}
+            >
+              <div className="text-sm font-medium">{day}</div>
+              {dayPayments.length > 0 && (
+                <div className="absolute bottom-1 left-1 right-1 space-y-1">
+                  {dayPayments.slice(0, 2).map((payment, idx) => (
+                    <div
+                      key={idx}
+                      className={`text-xs p-1 rounded truncate ${
+                        payment.status === "overdue"
+                          ? "bg-red-500 text-white"
+                          : payment.status === "due_soon"
+                          ? "bg-orange-500 text-white"
+                          : "bg-blue-500 text-white"
+                      }`}
+                    >
+                      {payment.amount.toFixed(1)} ETH
+                    </div>
+                  ))}
+                  {dayPayments.length > 2 && (
+                    <div className="text-xs text-center text-muted-foreground">
+                      +{dayPayments.length - 2} more
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </Card>
+  )
+}
+
