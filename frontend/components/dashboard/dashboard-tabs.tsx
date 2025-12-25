@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MyGroups } from "@/components/dashboard/my-groups"
-import { CreateGroup } from "@/components/dashboard/create-group"
-import { Transactions } from "@/components/dashboard/transactions"
-import { Profile } from "@/components/dashboard/profile"
-import { Home, PlusCircle, Receipt, User } from "lucide-react"
+import { useState, useCallback } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MyGroups } from "@/components/dashboard/my-groups";
+import { CreateGroup } from "@/components/dashboard/create-group";
+import { Transactions } from "@/components/dashboard/transactions";
+import { Profile } from "@/components/dashboard/profile";
+import { Home, PlusCircle, Receipt, User } from "lucide-react";
+import Link from "next/link";
+import { BarChart3 } from "lucide-react";
 
 export function DashboardTabs() {
-  const [activeTab, setActiveTab] = useState("groups")
+  const [activeTab, setActiveTab] = useState("groups");
 
   const handleCreateClick = useCallback(() => {
-    setActiveTab("create")
-  }, [])
+    setActiveTab("create");
+  }, []);
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -51,6 +53,13 @@ export function DashboardTabs() {
       <TabsContent value="profile" className="mt-0">
         <Profile />
       </TabsContent>
+
+      <Link href="/dashboard/analytics">
+        <Button variant="ghost" className="gap-2">
+          <BarChart3 className="h-4 w-4" />
+          Analytics
+        </Button>
+      </Link>
     </Tabs>
-  )
+  );
 }
