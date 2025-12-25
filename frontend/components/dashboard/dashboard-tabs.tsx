@@ -39,6 +39,13 @@ export function DashboardTabs() {
         </TabsTrigger>
       </TabsList>
 
+      <Link href="/dashboard/analytics">
+        <Button variant="ghost" className="gap-2">
+          <BarChart3 className="h-4 w-4" />
+          Analytics
+        </Button>
+      </Link>
+      
       <TabsContent value="groups" className="mt-0">
         <MyGroups onCreateClick={handleCreateClick} />
       </TabsContent>
@@ -55,12 +62,6 @@ export function DashboardTabs() {
         <Profile />
       </TabsContent>
 
-      <Link href="/dashboard/analytics">
-        <Button variant="ghost" className="gap-2">
-          <BarChart3 className="h-4 w-4" />
-          Analytics
-        </Button>
-      </Link>
     </Tabs>
   );
 }
