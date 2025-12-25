@@ -35,4 +35,63 @@ interface ReminderPreferences {
       }
     }
   
+    // Check for upcoming payments and send reminders
+    private async checkReminders() {
+      try {
+        // Get reminder preferences
+        const prefsStr = localStorage.getItem('reminder-preferences')
+        if (!prefsStr) return
+  
+        const prefs: ReminderPreferences = JSON.parse(prefsStr)
+        if (!prefs.enabled) return
+  
+        // Get user address
+        const address = localStorage.getItem('user-address')
+        if (!address) return
+  
+        // Fetch upcoming payments
+        const response = await fetch(`/api/calendar/payments?userAddress=${address}`)
+        if (!response.ok) return
+  
+        const payments = await response.json()
+  
+        // Check each payment
+        payments.forEach((payment: any) => {
+          if (payment.hasPaid) return // Skip if already paid
+  
+          const now = new Date().getTime()
+          const dueTime = new Date(payment.dueDate).getTime()
+          const timeUntilDue = dueTime - now
+  
+          // Convert to hours
+          const hoursUntilDue = timeUntilDue / (1000 * 60 * 60)
+  
+          // Check if we should send a reminder
+          let shouldRemind = false
+          let reminderMessage = ''
+  
+          if (prefs.threeDaysBefore && hoursUntilDue <= 72 && hoursUntilDue > 71) {
+            shouldRemind = true
+            reminderMessage = `Payment due in 3 days: ${payment.poolName}`
+          } else if (prefs.oneDayBefore && hoursUntilDue <= 24 && hoursUntilDue > 23) {
+            shouldRemind = true
+            reminderMessage = `Payment due tomorrow: ${payment.poolName}`
+          } else if (prefs.twoHoursBefore && hoursUntilDue <= 2 && hoursUntilDue > 1.9) {
+            shouldRemind = true
+            reminderMessage = `⚠️ Payment due in 2 hours: ${payment.poolName}`
+          } else if (prefs.thirtyMinsBefore && hoursUntilDue <= 0.5 && hoursUntilDue > 0.4) {
+            shouldRemind = true
+            reminderMessage = `🚨 URGENT: Payment due in 30 minutes: ${payment.poolName}`
+          }
+  
+          if (shouldRemind) {
+            this.sendReminder(payment, reminderMessage, prefs)
+          }
+        })
+      } catch (error) {
+        console.error('Reminder check failed:', error)
+      }
+    }
+  
     
+  }
