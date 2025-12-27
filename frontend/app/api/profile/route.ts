@@ -16,4 +16,10 @@ export async function GET(req: NextRequest) {
     // Ensure profile exists (creates if not)
     const profile = await ensureMemberProfile(walletAddress)
 
-    
+    // Fetch badges
+    const { data: badges } = await supabase
+      .from('member_badges')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .order('earned_at', { ascending: false })
+
