@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated theme for BaseSafe with green/teal accents and modern fintech aesthetic */
+  /* Updated theme for AJO with green/teal accents and modern fintech aesthetic */
   --background: oklch(0.99 0.005 120);
   --foreground: oklch(0.15 0.01 120);
   --card: oklch(1 0 0);
