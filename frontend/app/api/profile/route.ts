@@ -61,3 +61,19 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// PATCH - Update profile
+export async function PATCH(req: NextRequest) {
+  try {
+    const walletAddress = req.nextUrl.searchParams.get('address')
+    
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: 'Wallet address required' },
+        { status: 400 }
+      )
+    }
+
+    const body = await req.json()
+    const { display_name, bio, avatar_url } = body
+
+    
