@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { supabase } from '@/lib/supabase'
 
 // PATCH - Mark notification as read
 export async function PATCH(
