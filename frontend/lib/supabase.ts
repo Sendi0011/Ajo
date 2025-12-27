@@ -321,8 +321,34 @@ export async function ensureMemberProfile(walletAddress: string) {
   return data
 }
 
+// Helper function to update reputation after payment
+export async function updateReputationAfterPayment(
+  walletAddress: string,
+  poolId: string,
+  wasOnTime: boolean
+) {
+  const profile = await ensureMemberProfile(walletAddress)
 
+  const updates: any = {
+    last_active_at: new Date().toISOString(),
+  }
 
+  if (wasOnTime) {
+    updates.on_time_payments = (profile.on_time_payments || 0) + 1
+  } else {
+    updates.late_payments = (profile.late_payments || 0) + 1
+  }
+
+  const { data: updatedProfile, error } = await supabase
+    .from('member_profiles')
+    .update(updates)
+    .eq('wallet_address', walletAddress.toLowerCase())
+    .select()
+    .single()
+
+  if (error) throw error
+
+  
 // Helper function to save pool (updated with profile creation)
 export async function savePoolToDatabase({
   name,
