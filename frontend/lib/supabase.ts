@@ -348,7 +348,23 @@ export async function updateReputationAfterPayment(
 
   if (error) throw error
 
-  
+  // Record in history
+  const pointsChange = wasOnTime ? 5 : -2
+  await supabase.from('reputation_history').insert([
+    {
+      wallet_address: walletAddress.toLowerCase(),
+      pool_id: poolId,
+      action_type: wasOnTime ? 'payment_made' : 'payment_late',
+      points_change: pointsChange,
+      previous_score: profile.reputation_score,
+      new_score: updatedProfile.reputation_score,
+      description: wasOnTime ? 'On-time payment made' : 'Late payment made',
+    },
+  ])
+
+  return updatedProfile
+}
+
 // Helper function to save pool (updated with profile creation)
 export async function savePoolToDatabase({
   name,
