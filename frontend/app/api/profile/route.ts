@@ -76,4 +76,29 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json()
     const { display_name, bio, avatar_url } = body
 
-    
+    // Only allow updating these safe fields
+    const updates: any = {}
+    if (display_name !== undefined) updates.display_name = display_name
+    if (bio !== undefined) updates.bio = bio
+    if (avatar_url !== undefined) updates.avatar_url = avatar_url
+    updates.updated_at = new Date().toISOString()
+
+    const { data, error } = await supabase
+      .from('member_profiles')
+      .update(updates)
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Profile update error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
