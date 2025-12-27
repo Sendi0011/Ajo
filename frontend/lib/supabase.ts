@@ -297,6 +297,30 @@ export type Database = {
   }
 }
 
+// Helper function to ensure member profile exists
+export async function ensureMemberProfile(walletAddress: string) {
+  const { data, error } = await supabase
+    .from('member_profiles')
+    .select('*')
+    .eq('wallet_address', walletAddress.toLowerCase())
+    .single()
+
+  if (error && error.code === 'PGRST116') {
+    // Profile doesn't exist, create it
+    const { data: newProfile, error: createError } = await supabase
+      .from('member_profiles')
+      .insert([{ wallet_address: walletAddress.toLowerCase() }])
+      .select()
+      .single()
+
+    if (createError) throw createError
+    return newProfile
+  }
+
+  if (error) throw error
+  return data
+}
+
 
 
 // Helper function to save pool (updated with profile creation)
