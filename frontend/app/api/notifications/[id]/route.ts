@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server"
+
 // PATCH - Mark notification as read
 export async function PATCH(
     req: NextRequest,
