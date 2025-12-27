@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server"
+
 export async function POST_MARK_ALL(req: NextRequest) {
     try {
       const body = await req.json()
