@@ -102,3 +102,17 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// POST - Award badge to user
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { wallet_address, badge_type, badge_name, badge_description, badge_icon } = body
+
+    if (!wallet_address || !badge_type || !badge_name) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+   
