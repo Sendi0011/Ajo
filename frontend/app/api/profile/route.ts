@@ -23,3 +23,12 @@ export async function GET(req: NextRequest) {
       .eq('wallet_address', walletAddress.toLowerCase())
       .order('earned_at', { ascending: false })
 
+    // Fetch recent reputation history
+    const { data: reputationHistory } = await supabase
+      .from('reputation_history')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .order('created_at', { ascending: false })
+      .limit(10)
+
+    
