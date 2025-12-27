@@ -31,4 +31,33 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(10)
 
-    
+    // Fetch pools the user is part of
+    const { data: memberPools } = await supabase
+      .from('pool_members')
+      .select(`
+        *,
+        pools:pool_id (
+          id,
+          name,
+          type,
+          status,
+          created_at
+        )
+      `)
+      .eq('member_address', walletAddress.toLowerCase())
+
+    return NextResponse.json({
+      profile,
+      badges: badges || [],
+      reputationHistory: reputationHistory || [],
+      pools: memberPools || [],
+    })
+  } catch (error) {
+    console.error('Profile fetch error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
