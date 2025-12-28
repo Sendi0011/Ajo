@@ -397,7 +397,31 @@ export function ProfileEnhanced() {
         </Card>
       )}
 
-
+      {/* Reputation Info */}
+      <Card className="p-6 bg-muted/30">
+        <h3 className="text-lg font-semibold mb-2">How Reputation Works</h3>
+        <p className="text-muted-foreground text-sm mb-4">
+          Your reputation score is calculated based on your savings behavior. Build trust and unlock benefits:
+        </p>
+        <ul className="space-y-2 text-sm">
+          <li className="flex gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5" />
+            <span className="text-muted-foreground"><strong>+5 points</strong> for each on-time payment</span>
+          </li>
+          <li className="flex gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5" />
+            <span className="text-muted-foreground"><strong>-2 points</strong> for late payments</span>
+          </li>
+          <li className="flex gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5" />
+            <span className="text-muted-foreground"><strong>+10 points</strong> for completing a savings group</span>
+          </li>
+          <li className="flex gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5" />
+            <span className="text-muted-foreground">Higher scores = Lower fees & premium group access</span>
+          </li>
+        </ul>
+      </Card>
     </div>
   )
 }
