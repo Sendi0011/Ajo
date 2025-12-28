@@ -337,6 +337,30 @@ export function ProfileEnhanced() {
         </div>
       </Card>
 
+      {/* Badges */}
+      {badges.length > 0 && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Award className="h-5 w-5 text-primary" />
+            Badges Earned ({badges.length})
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {badges.map((badge) => (
+              <div
+                key={badge.id}
+                className="p-4 rounded-lg bg-muted/30 text-center hover:bg-muted/50 transition-colors"
+              >
+                <div className="text-3xl mb-2">{badge.badge_icon || "🏆"}</div>
+                <p className="font-medium text-sm">{badge.badge_name}</p>
+                {badge.badge_description && (
+                  <p className="text-xs text-muted-foreground mt-1">{badge.badge_description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       
     </div>
   )
