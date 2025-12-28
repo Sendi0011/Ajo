@@ -245,7 +245,25 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               </Badge>
             </div>
 
+            {/* Invite Details */}
+            <div className="space-y-2 text-sm">
+              {inviteData.max_uses && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Max Uses:</span>
+                  <span className="font-medium">{inviteData.max_uses}</span>
+                </div>
+              )}
+              {inviteData.expires_at && (
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Expires:</span>
+                  <span className="font-medium">
+                    {new Date(inviteData.expires_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+            </div>
 
+            
           </div>
         )}
       </DialogContent>
