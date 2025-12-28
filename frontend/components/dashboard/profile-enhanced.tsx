@@ -361,7 +361,43 @@ export function ProfileEnhanced() {
         </Card>
       )}
 
-      
+      {/* Recent Activity */}
+      {reputationHistory.length > 0 && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Recent Reputation Changes
+          </h3>
+          <div className="space-y-3">
+            {reputationHistory.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/30"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`h-2 w-2 rounded-full ${item.points_change > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <div>
+                    <p className="text-sm font-medium">{item.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`text-sm font-bold ${item.points_change > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {item.points_change > 0 ? '+' : ''}{item.points_change}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.previous_score} → {item.new_score}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+
     </div>
   )
 }
