@@ -150,6 +150,22 @@ export function ProfileEnhanced() {
     ? ((profile.on_time_payments / totalPayments) * 100).toFixed(1)
     : "N/A"
 
-  
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-start">
+        <div>
+          <h2 className="text-3xl font-bold">Profile</h2>
+          <p className="text-muted-foreground mt-1">Your on-chain savings reputation</p>
+        </div>
+        {!isEditing && (
+          <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+            <Edit2 className="h-4 w-4 mr-2" />
+            Edit Profile
+          </Button>
+        )}
+      </div>
+
+     
+    </div>
   )
 }
