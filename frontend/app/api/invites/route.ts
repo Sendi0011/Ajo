@@ -62,3 +62,102 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// GET - Fetch invite details or list invites
+export async function GET(req: NextRequest) {
+  try {
+    const inviteCode = req.nextUrl.searchParams.get('code')
+    const poolId = req.nextUrl.searchParams.get('pool_id')
+    const inviterAddress = req.nextUrl.searchParams.get('inviter')
+
+    if (inviteCode) {
+      // Fetch single invite by code
+      const { data, error } = await supabase
+        .from('group_invites')
+        .select(`
+          *,
+          pools:pool_id (
+            id,
+            name,
+            type,
+            description,
+            members_count,
+            creator_address,
+            status
+          ),
+          inviter:inviter_address (
+            wallet_address,
+            display_name,
+            reputation_score,
+            avatar_url
+          )
+        `)
+        .eq('invite_code', inviteCode)
+        .single()
+
+      if (error) {
+        return NextResponse.json(
+          { error: 'Invite not found' },
+          { status: 404 }
+        )
+      }
+
+      // Check if invite is still valid
+      const isValid = data.is_active &&
+        (!data.expires_at || new Date(data.expires_at) > new Date()) &&
+        (!data.max_uses || data.uses_count < data.max_uses)
+
+      // Fetch recent uses
+      const { data: recentUses } = await supabase
+        .from('invite_uses')
+        .select('*, invitee:invitee_address(*)')
+        .eq('invite_id', data.id)
+        .order('used_at', { ascending: false })
+        .limit(5)
+
+      return NextResponse.json({
+        ...data,
+        is_valid: isValid,
+        recent_uses: recentUses || [],
+      })
+    } else if (poolId) {
+      // Fetch all invites for a pool
+      const { data, error } = await supabase
+        .from('group_invites')
+        .select('*')
+        .eq('pool_id', poolId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return NextResponse.json(data || [])
+    } else if (inviterAddress) {
+      // Fetch all invites by inviter
+      const { data, error } = await supabase
+        .from('group_invites')
+        .select(`
+          *,
+          pools:pool_id (
+            id,
+            name,
+            type
+          )
+        `)
+        .eq('inviter_address', inviterAddress.toLowerCase())
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return NextResponse.json(data || [])
+    } else {
+      return NextResponse.json(
+        { error: 'Provide code, pool_id, or inviter parameter' },
+        { status: 400 }
+      )
+    }
+  } catch (error) {
+    console.error('Invite fetch error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
