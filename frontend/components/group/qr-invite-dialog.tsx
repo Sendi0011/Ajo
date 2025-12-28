@@ -263,7 +263,28 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               )}
             </div>
 
-            
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" onClick={shareInvite}>
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button variant="outline" onClick={downloadQR}>
+                <QrCode className="h-4 w-4 mr-2" />
+                Download QR
+              </Button>
+            </div>
+
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => {
+                setInviteData(null)
+                setOpen(false)
+              }}
+            >
+              Generate New Link
+            </Button>
           </div>
         )}
       </DialogContent>
