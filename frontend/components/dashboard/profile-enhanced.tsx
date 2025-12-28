@@ -234,7 +234,24 @@ export function ProfileEnhanced() {
           )}
         </div>
 
-        
+        {/* Reputation Progress Bar */}
+        {!isEditing && (
+          <div className="mt-6 pt-6 border-t border-border">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-muted-foreground">Reputation Score</span>
+              <span className="font-semibold">{profile.reputation_score}/100</span>
+            </div>
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all duration-1000"
+                style={{ width: `${profile.reputation_score}%` }}
+              />
+            </div>
+          </div>
+        )}
+      </Card>
+
+      
     </div>
   )
 }
