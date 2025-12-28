@@ -251,6 +251,45 @@ export function ProfileEnhanced() {
         )}
       </Card>
 
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10">
+              <Users className="h-6 w-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{profile.total_groups_joined}</p>
+              <p className="text-xs text-muted-foreground">Groups Joined</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{profile.on_time_payments}</p>
+              <p className="text-xs text-muted-foreground">On-time Payments</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10">
+              <Trophy className="h-6 w-6 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{profile.completed_groups}</p>
+              <p className="text-xs text-muted-foreground">Completed Groups</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       
     </div>
   )
