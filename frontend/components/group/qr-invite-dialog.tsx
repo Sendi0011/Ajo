@@ -234,7 +234,20 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               </div>
             </div>
 
-            
+            {/* Invite Code */}
+            <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+              <div>
+                <p className="text-xs text-muted-foreground">Invite Code</p>
+                <p className="font-mono font-bold text-lg">{inviteData.invite_code}</p>
+              </div>
+              <Badge variant="secondary">
+                {inviteData.uses_count} uses
+              </Badge>
+            </div>
+
+
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
