@@ -162,6 +162,55 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               </div>
             )}
 
+            {/* Max Uses Setting */}
+            <div className="flex items-center justify-between space-x-2">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <Label htmlFor="limit-uses" className="text-sm font-medium">
+                  Limit Uses
+                </Label>
+              </div>
+              <Switch
+                id="limit-uses"
+                checked={limitUses}
+                onCheckedChange={setLimitUses}
+              />
+            </div>
+
+            {limitUses && (
+              <div className="pl-6 space-y-2">
+                <Label htmlFor="max-uses" className="text-xs">Maximum uses</Label>
+                <Input
+                  id="max-uses"
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={maxUses || ""}
+                  onChange={(e) => setMaxUses(parseInt(e.target.value) || undefined)}
+                  placeholder="Unlimited"
+                />
+              </div>
+            )}
+
+            <Button
+              onClick={generateInvite}
+              disabled={loading}
+              className="w-full mt-4"
+            >
+              {loading ? "Generating..." : "Generate Invite Link"}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4 py-4">
+            {/* QR Code Display */}
+            <div className="flex justify-center p-4 bg-muted/30 rounded-lg">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(inviteData.invite_url)}`}
+                alt="Invite QR Code"
+                className="w-48 h-48"
+              />
+            </div>
+
             
       </DialogContent>
     </Dialog>
