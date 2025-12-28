@@ -211,6 +211,29 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               />
             </div>
 
+            {/* Invite Link */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Invite Link</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={inviteData.invite_url}
+                  readOnly
+                  className="font-mono text-xs"
+                />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+
             
       </DialogContent>
     </Dialog>
