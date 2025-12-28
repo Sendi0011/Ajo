@@ -165,7 +165,76 @@ export function ProfileEnhanced() {
         )}
       </div>
 
-     
+      {/* Profile Card */}
+      <Card className="p-6">
+        <div className="flex items-start gap-6">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary text-2xl font-bold">
+            {profile.display_name ? profile.display_name.charAt(0).toUpperCase() : address?.slice(2, 4).toUpperCase()}
+          </div>
+          
+          <div className="flex-1">
+            {isEditing ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Display Name</label>
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Bio</label>
+                  <Textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell us about yourself"
+                    rows={3}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveProfile}>Save Changes</Button>
+                  <Button variant="outline" onClick={() => {
+                    setIsEditing(false)
+                    setDisplayName(profile.display_name || "")
+                    setBio(profile.bio || "")
+                  }}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-xl font-bold">
+                    {profile.display_name || "Anonymous Saver"}
+                  </h3>
+                  <Badge className={`${repLevel.bg} ${repLevel.color} border-none`}>
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    {repLevel.label}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground font-mono mb-2">
+                  {formatAddress(address || "")}
+                </p>
+                {profile.bio && (
+                  <p className="text-sm text-muted-foreground mt-2">{profile.bio}</p>
+                )}
+              </>
+            )}
+          </div>
+
+          {!isEditing && (
+            <div className="text-center">
+              <div className="text-4xl font-bold text-primary mb-1">
+                {profile.reputation_score}
+              </div>
+              <p className="text-xs text-muted-foreground">Reputation</p>
+            </div>
+          )}
+        </div>
+
+        
     </div>
   )
 }
