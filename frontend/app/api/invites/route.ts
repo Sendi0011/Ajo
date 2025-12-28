@@ -161,3 +161,54 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// PATCH - Use invite (join via invite code)
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json()
+    const { invite_code, invitee_address } = body
+
+    if (!invite_code || !invitee_address) {
+      return NextResponse.json(
+        { error: 'Missing invite_code or invitee_address' },
+        { status: 400 }
+      )
+    }
+
+    // Fetch invite
+    const { data: invite, error: inviteError } = await supabase
+      .from('group_invites')
+      .select('*')
+      .eq('invite_code', invite_code)
+      .single()
+
+    if (inviteError || !invite) {
+      return NextResponse.json(
+        { error: 'Invalid invite code' },
+        { status: 404 }
+      )
+    }
+
+    // Validate invite
+    if (!invite.is_active) {
+      return NextResponse.json(
+        { error: 'Invite has been deactivated' },
+        { status: 400 }
+      )
+    }
+
+    if (invite.expires_at && new Date(invite.expires_at) < new Date()) {
+      return NextResponse.json(
+        { error: 'Invite has expired' },
+        { status: 400 }
+      )
+    }
+
+    if (invite.max_uses && invite.uses_count >= invite.max_uses) {
+      return NextResponse.json(
+        { error: 'Invite has reached maximum uses' },
+        { status: 400 }
+      )
+    }
+
+    
+}
