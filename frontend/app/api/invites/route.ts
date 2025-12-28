@@ -225,5 +225,25 @@ export async function PATCH(req: NextRequest) {
       )
     }
 
+    // Record invite use
+    const { error: useError } = await supabase
+      .from('invite_uses')
+      .insert([
+        {
+          invite_id: invite.id,
+          invitee_address: invitee_address.toLowerCase(),
+        },
+      ])
+
+    if (useError) throw useError
+
+    // Increment uses count
+    const { error: updateError } = await supabase
+      .from('group_invites')
+      .update({ uses_count: invite.uses_count + 1 })
+      .eq('id', invite.id)
+
+    if (updateError) throw updateError
+
     
 }
