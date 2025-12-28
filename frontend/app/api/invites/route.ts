@@ -266,5 +266,33 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+// DELETE - Deactivate invite
+export async function DELETE(req: NextRequest) {
+  try {
+    const inviteCode = req.nextUrl.searchParams.get('code')
 
+    if (!inviteCode) {
+      return NextResponse.json(
+        { error: 'Invite code required' },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('group_invites')
+      .update({ is_active: false })
+      .eq('invite_code', inviteCode)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    console.error('Invite deactivation error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
 }
