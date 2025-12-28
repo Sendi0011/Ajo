@@ -148,8 +148,21 @@ export function QRInviteDialog({ poolId, poolName }: QRInviteDialogProps) {
               />
             </div>
 
+            {hasExpiration && (
+              <div className="pl-6 space-y-2">
+                <Label htmlFor="days" className="text-xs">Expires in (days)</Label>
+                <Input
+                  id="days"
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={expiresInDays}
+                  onChange={(e) => setExpiresInDays(parseInt(e.target.value) || 7)}
+                />
+              </div>
+            )}
+
             
-        )}
       </DialogContent>
     </Dialog>
   )
