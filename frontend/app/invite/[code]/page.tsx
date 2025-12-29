@@ -107,4 +107,79 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
       return
     }
 
-   
+    setJoining(true)
+    try {
+      // Use the invite
+      const response = await fetch("/api/invites", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          invite_code: code,
+          invitee_address: address,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to join group")
+        return
+      }
+
+      const data = await response.json()
+      toast.success("Successfully joined the group!")
+      
+      // Redirect to the group page
+      router.push(`/dashboard/group/${data.pool.id}`)
+    } catch (error) {
+      console.error("Failed to join group:", error)
+      toast.error("Failed to join group")
+    } finally {
+      setJoining(false)
+    }
+  }
+
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+  }
+
+  const getPoolTypeIcon = (type: string) => {
+    switch (type) {
+      case "rotational":
+        return "🔄"
+      case "target":
+        return "🎯"
+      case "flexible":
+        return "💎"
+      default:
+        return "💰"
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (error || !inviteData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center">
+          <XCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Invalid Invite</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Link href="/dashboard">
+            <Button className="w-full">Go to Dashboard</Button>
+          </Link>
+        </Card>
+      </div>
+    )
+  }
+
+  const pool = inviteData.pools
+  const inviter = inviteData.inviter
+
+  
+}
