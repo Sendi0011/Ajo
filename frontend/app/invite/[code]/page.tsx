@@ -193,7 +193,20 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
           </p>
         </div>
 
-       
+        {/* Main Invite Card */}
+        <Card className="p-6 mb-6">
+          {/* Group Info */}
+          <div className="space-y-4 mb-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-1">{pool.name}</h2>
+              <Badge className="capitalize">{pool.type} Pool</Badge>
+            </div>
+
+            {pool.description && (
+              <p className="text-muted-foreground">{pool.description}</p>
+            )}
+
+            
     </div>
   )
 }
