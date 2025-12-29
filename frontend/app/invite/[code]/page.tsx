@@ -181,5 +181,19 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
   const pool = inviteData.pools
   const inviter = inviteData.inviter
 
-  
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-12 max-w-2xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4">{getPoolTypeIcon(pool.type)}</div>
+          <h1 className="text-3xl font-bold mb-2">You're Invited!</h1>
+          <p className="text-muted-foreground">
+            Join <strong>{pool.name}</strong> and start saving together
+          </p>
+        </div>
+
+       
+    </div>
+  )
 }
