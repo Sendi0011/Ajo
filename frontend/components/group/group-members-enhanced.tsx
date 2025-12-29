@@ -224,7 +224,48 @@ export function GroupMembersEnhanced({ groupId }: { groupId: string }) {
         )}
       </Card>
 
-      
+      {/* Member Stats Card */}
+      {members.length > 0 && (
+        <Card className="p-4">
+          <h4 className="text-sm font-semibold mb-3">Group Statistics</h4>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-bold text-green-500">
+                {members.filter(m => m.status === 'paid').length}
+              </p>
+              <p className="text-xs text-muted-foreground">Paid</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-yellow-500">
+                {members.filter(m => m.status === 'late').length}
+              </p>
+              <p className="text-xs text-muted-foreground">Late</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-muted-foreground">
+                {members.filter(m => m.status === 'pending').length}
+              </p>
+              <p className="text-xs text-muted-foreground">Pending</p>
+            </div>
+          </div>
+
+          {members.some(m => m.profile) && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Avg. Reputation</span>
+                <span className="font-bold text-primary">
+                  {Math.round(
+                    members
+                      .filter(m => m.profile)
+                      .reduce((sum, m) => sum + (m.profile?.reputation_score || 0), 0) /
+                    members.filter(m => m.profile).length
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
     </div>
   )
 }
