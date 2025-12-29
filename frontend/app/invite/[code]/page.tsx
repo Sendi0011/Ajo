@@ -206,7 +206,50 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
               <p className="text-muted-foreground">{pool.description}</p>
             )}
 
-            
+            {/* Group Stats */}
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Members</p>
+                  <p className="font-bold">{pool.members_count}</p>
+                </div>
+              </div>
+
+              {pool.contribution_amount && (
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Contribution</p>
+                    <p className="font-bold">{pool.contribution_amount} ETH</p>
+                  </div>
+                </div>
+              )}
+
+              {pool.target_amount && (
+                <div className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Target</p>
+                    <p className="font-bold">{pool.target_amount} ETH</p>
+                  </div>
+                </div>
+              )}
+
+              {pool.frequency && (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm text-muted-foreground">Frequency</p>
+                    <p className="font-bold capitalize">{pool.frequency}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          
+      </div>
     </div>
   )
 }
