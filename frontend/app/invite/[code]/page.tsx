@@ -278,6 +278,26 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
             </div>
           </div>
 
+          {/* Invite Status */}
+          <div className="space-y-2 text-sm mb-6">
+            {inviteData.max_uses && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Uses</span>
+                <span className="font-medium">
+                  {inviteData.uses_count} / {inviteData.max_uses}
+                </span>
+              </div>
+            )}
+            {inviteData.expires_at && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Expires</span>
+                <span className="font-medium">
+                  {new Date(inviteData.expires_at).toLocaleDateString()}
+                </span>
+              </div>
+            )}
+          </div>
+
 
     </div>
   )
