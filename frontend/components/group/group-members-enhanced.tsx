@@ -116,5 +116,25 @@ export function GroupMembersEnhanced({ groupId }: { groupId: string }) {
     )
   }
 
-  
+  return (
+    <div className="space-y-4">
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Members ({members.length})</h3>
+          {pool && (
+            <QRInviteDialog poolId={pool.id} poolName={pool.name} />
+          )}
+        </div>
+
+        {members.length === 0 ? (
+          <div className="text-center py-8">
+            <UserPlus className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No members yet</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Invite members using the button above
+            </p>
+          </div>
+        ) : (
+          
+  )
 }
