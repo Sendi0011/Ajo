@@ -135,6 +135,30 @@ export function GroupMembersEnhanced({ groupId }: { groupId: string }) {
             </p>
           </div>
         ) : (
-          
+          <div className="space-y-3">
+            {members.map((member) => {
+              const repBadge = member.profile 
+                ? getReputationBadge(member.profile.reputation_score)
+                : null
+              const isCreator = pool?.creator_address.toLowerCase() === member.member_address.toLowerCase()
+
+              return (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    {/* Avatar */}
+                    <Avatar className="h-12 w-12">
+                      <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                        {member.profile?.display_name 
+                          ? member.profile.display_name.charAt(0).toUpperCase()
+                          : member.member_address.slice(2, 4).toUpperCase()
+                        }
+                      </AvatarFallback>
+                    </Avatar>
+
+                    
+    </div>
   )
 }
