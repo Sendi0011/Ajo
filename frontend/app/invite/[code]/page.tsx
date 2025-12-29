@@ -298,7 +298,47 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
             )}
           </div>
 
+          {/* Action Button */}
+          {!isConnected ? (
+            <Alert className="mb-4">
+              <AlertDescription>
+                Please connect your wallet to join this group
+              </AlertDescription>
+            </Alert>
+          ) : (
+            inviteData.is_valid && (
+              <Alert className="mb-4 border-primary/50 bg-primary/5">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <AlertDescription>
+                  This invite is valid! Click below to join the group.
+                </AlertDescription>
+              </Alert>
+            )
+          )}
 
+          <Button
+            onClick={handleJoinGroup}
+            disabled={!isConnected || !inviteData.is_valid || joining}
+            className="w-full"
+            size="lg"
+          >
+            {joining ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Joining...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+                Join Group
+              </>
+            )}
+          </Button>
+        </Card>
+
+
+        )}
+      </div>
     </div>
   )
 }
