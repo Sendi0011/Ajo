@@ -198,7 +198,33 @@ export function GroupMembersEnhanced({ groupId }: { groupId: string }) {
                     </div>
                   </div>
 
-                  
+                  {/* Status & Actions */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end gap-1">
+                      {getStatusIcon(member.status)}
+                      <span className="text-xs text-muted-foreground capitalize">
+                        {member.status}
+                      </span>
+                    </div>
+
+                    <Link href={`/profile/${member.member_address}`}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </Card>
+
+      
     </div>
   )
 }
