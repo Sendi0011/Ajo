@@ -158,7 +158,47 @@ export function GroupMembersEnhanced({ groupId }: { groupId: string }) {
                       </AvatarFallback>
                     </Avatar>
 
-                    
+                    {/* Member Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-sm truncate">
+                          {member.profile?.display_name || formatAddress(member.member_address)}
+                        </p>
+                        {isCreator && (
+                          <Badge variant="secondary" className="text-xs">
+                            <Crown className="h-3 w-3 mr-1" />
+                            Creator
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {formatAddress(member.member_address)}
+                        </p>
+                        
+                        {member.profile && repBadge && (
+                          <Badge className={`${repBadge.color} border-none text-xs`}>
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            {member.profile.reputation_score}
+                          </Badge>
+                        )}
+
+                        {member.profile && member.profile.on_time_payments > 0 && (
+                          <Badge variant="outline" className="text-xs">
+                            <Award className="h-3 w-3 mr-1" />
+                            {member.profile.on_time_payments} payments
+                          </Badge>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Contribution: {member.contribution_amount.toFixed(2)} ETH
+                      </p>
+                    </div>
+                  </div>
+
+                  
     </div>
   )
 }
