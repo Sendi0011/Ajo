@@ -248,8 +248,37 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
             </div>
           </div>
 
-          
-      </div>
+          {/* Inviter Info */}
+          <div className="p-4 bg-muted/30 rounded-lg mb-6">
+            <p className="text-sm text-muted-foreground mb-2">Invited by</p>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                {inviter.display_name 
+                  ? inviter.display_name.charAt(0).toUpperCase()
+                  : inviter.wallet_address.slice(2, 4).toUpperCase()
+                }
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">
+                  {inviter.display_name || formatAddress(inviter.wallet_address)}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    {inviter.reputation_score} reputation
+                  </Badge>
+                  {inviter.wallet_address.toLowerCase() === pool.creator_address.toLowerCase() && (
+                    <Badge variant="secondary" className="text-xs">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Creator
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
     </div>
   )
 }
