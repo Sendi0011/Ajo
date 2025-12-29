@@ -336,7 +336,28 @@ export default function InvitePage({ params }: { params: Promise<{ code: string 
           </Button>
         </Card>
 
-
+        {/* Recent Activity */}
+        {inviteData.recent_uses.length > 0 && (
+          <Card className="p-6">
+            <h3 className="text-sm font-semibold mb-3">
+              Recent Members ({inviteData.recent_uses.length})
+            </h3>
+            <div className="space-y-2">
+              {inviteData.recent_uses.map((use: any) => (
+                <div
+                  key={use.id}
+                  className="flex items-center justify-between text-sm p-2 rounded bg-muted/30"
+                >
+                  <span className="font-mono">
+                    {formatAddress(use.invitee_address)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(use.used_at).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
         )}
       </div>
     </div>
