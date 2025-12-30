@@ -179,7 +179,23 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
               </div>
             </div>
 
-           
+            {/* Reputation Score */}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-primary mb-1">
+                {profile.reputation_score}
+              </div>
+              <p className="text-xs text-muted-foreground">Reputation</p>
+              <div className="h-2 w-20 bg-muted rounded-full overflow-hidden mt-2">
+                <div
+                  className="h-full bg-primary transition-all duration-500"
+                  style={{ width: `${profile.reputation_score}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        </Card>
+
+
           </div>
         </Card>
       </div>
