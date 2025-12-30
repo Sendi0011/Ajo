@@ -195,7 +195,91 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
           </div>
         </Card>
 
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card className="p-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10 mb-2">
+                <Users className="h-6 w-6 text-blue-500" />
+              </div>
+              <p className="text-2xl font-bold">{profile.total_groups_joined}</p>
+              <p className="text-xs text-muted-foreground">Groups Joined</p>
+            </div>
+          </Card>
 
+          <Card className="p-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10 mb-2">
+                <CheckCircle2 className="h-6 w-6 text-green-500" />
+              </div>
+              <p className="text-2xl font-bold">{profile.on_time_payments}</p>
+              <p className="text-xs text-muted-foreground">On-time Payments</p>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-500/10 mb-2">
+                <Trophy className="h-6 w-6 text-purple-500" />
+              </div>
+              <p className="text-2xl font-bold">{profile.completed_groups}</p>
+              <p className="text-xs text-muted-foreground">Completed</p>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 mb-2">
+                <TrendingUp className="h-6 w-6 text-orange-500" />
+              </div>
+              <p className="text-2xl font-bold">{successRate}%</p>
+              <p className="text-xs text-muted-foreground">Success Rate</p>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Payment Statistics */}
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+              Payment Record
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="text-sm">On-time</span>
+                </div>
+                <span className="text-lg font-bold text-green-500">{profile.on_time_payments}</span>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-yellow-500/10">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-yellow-500" />
+                  <span className="text-sm">Late</span>
+                </div>
+                <span className="text-lg font-bold text-yellow-500">{profile.late_payments}</span>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 rounded-lg bg-red-500/10">
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  <span className="text-sm">Missed</span>
+                </div>
+                <span className="text-lg font-bold text-red-500">{profile.missed_payments}</span>
+              </div>
+
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total Contributions</span>
+                  <span className="text-lg font-bold">{profile.total_contributions.toFixed(4)} ETH</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          
           </div>
         </Card>
       </div>
