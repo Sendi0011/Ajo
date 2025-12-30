@@ -151,7 +151,36 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
               }
             </div>
             
+            {/* Profile Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">
+                  {profile.display_name || "Anonymous Saver"}
+                </h1>
+                <Badge className={`${repLevel.bg} ${repLevel.color} border-none`}>
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  {repLevel.label}
+                </Badge>
+              </div>
+              
+              <p className="text-sm text-muted-foreground font-mono mb-3">
+                {formatAddress(address)}
+              </p>
+              
+              {profile.bio && (
+                <p className="text-muted-foreground mb-4">{profile.bio}</p>
+              )}
 
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>Joined {new Date(profile.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+
+           
+          </div>
         </Card>
       </div>
     </div>
