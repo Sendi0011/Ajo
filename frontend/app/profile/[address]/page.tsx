@@ -129,4 +129,18 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
   const activePools = pools.filter(p => p.pools.status === 'active')
   const completedPools = pools.filter(p => p.pools.status === 'completed')
 
-  
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Back Button */}
+        <Button variant="ghost" className="mb-6" asChild>
+          <Link href="/dashboard">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </Button>
+
+       
+    </div>
+  )
+}
