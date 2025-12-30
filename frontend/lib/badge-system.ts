@@ -94,3 +94,21 @@ export const BADGE_DEFINITIONS = {
   }
 }
 
+/**
+ * Check and award eligible badges to a user
+ */
+export async function checkAndAwardBadges(walletAddress: string) {
+  try {
+    // Fetch user profile
+    const { data: profile, error: profileError } = await supabase
+      .from('member_profiles')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .single()
+
+    if (profileError || !profile) {
+      console.error('Failed to fetch profile:', profileError)
+      return
+    }
+
+    
