@@ -163,3 +163,45 @@ export async function checkAndAwardBadges(walletAddress: string) {
   }
 }
 
+/**
+ * Award a specific badge to a user
+ */
+export async function awardBadge(
+  walletAddress: string,
+  badgeType: keyof typeof BADGE_DEFINITIONS
+) {
+  const badge = BADGE_DEFINITIONS[badgeType]
+  if (!badge) {
+    throw new Error(`Unknown badge type: ${badgeType}`)
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('member_badges')
+      .insert([
+        {
+          wallet_address: walletAddress.toLowerCase(),
+          badge_type: badgeType,
+          badge_name: badge.name,
+          badge_description: badge.description,
+          badge_icon: badge.icon,
+        },
+      ])
+      .select()
+      .single()
+
+    if (error) {
+      // Badge already exists
+      if (error.code === '23505') {
+        return { success: false, message: 'Badge already earned' }
+      }
+      throw error
+    }
+
+    return { success: true, badge: data }
+  } catch (error) {
+    console.error('Failed to award badge:', error)
+    return { success: false, error }
+  }
+}
+
