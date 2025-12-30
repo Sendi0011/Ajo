@@ -143,4 +143,23 @@ export async function checkAndAwardBadges(walletAddress: string) {
       }
     }
 
-    
+    // Award new badges
+    if (newBadges.length > 0) {
+      const { error: insertError } = await supabase
+        .from('member_badges')
+        .insert(newBadges)
+
+      if (insertError) {
+        console.error('Failed to award badges:', insertError)
+      } else {
+        console.log(`Awarded ${newBadges.length} new badges to ${walletAddress}`)
+      }
+    }
+
+    return newBadges
+  } catch (error) {
+    console.error('Error in checkAndAwardBadges:', error)
+    return []
+  }
+}
+
