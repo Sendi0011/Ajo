@@ -205,3 +205,77 @@ export async function awardBadge(
   }
 }
 
+/**
+ * Get badges for a user with progress tracking
+ */
+export async function getUserBadgesWithProgress(walletAddress: string) {
+  try {
+    // Fetch profile
+    const { data: profile } = await supabase
+      .from('member_profiles')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+      .single()
+
+    if (!profile) return []
+
+    // Fetch earned badges
+    const { data: earnedBadges } = await supabase
+      .from('member_badges')
+      .select('*')
+      .eq('wallet_address', walletAddress.toLowerCase())
+
+    const earnedBadgeTypes = new Set(earnedBadges?.map(b => b.badge_type) || [])
+
+    // Calculate progress for all badges
+    const badgesWithProgress = await Promise.all(
+      Object.entries(BADGE_DEFINITIONS).map(async ([badgeType, badge]) => {
+        const earned = earnedBadgeTypes.has(badgeType)
+        
+        // Calculate progress (0-100%)
+        let progress = 0
+        if (!earned) {
+          // Add custom progress calculation per badge
+          switch (badgeType) {
+            case 'perfect_record':
+              progress = Math.min(100, (profile.on_time_payments / 10) * 100)
+              break
+            case 'trusted_saver':
+              progress = Math.min(100, (profile.reputation_score / 90) * 100)
+              break
+            case 'social_butterfly':
+              progress = Math.min(100, (profile.active_groups / 5) * 100)
+              break
+            case 'consistent_contributor':
+              progress = Math.min(100, (profile.on_time_payments / 25) * 100)
+              break
+            case 'high_roller':
+              progress = Math.min(100, (profile.total_contributions / 10) * 100)
+              break
+            default:
+              const requirement = badge.requirement(profile)
+              progress = requirement ? 100 : 0
+          }
+        } else {
+          progress = 100
+        }
+
+        return {
+          type: badgeType,
+          name: badge.name,
+          description: badge.description,
+          icon: badge.icon,
+          earned,
+          progress: Math.round(progress),
+          earnedAt: earnedBadges?.find(b => b.badge_type === badgeType)?.earned_at || null,
+        }
+      })
+    )
+
+    return badgesWithProgress
+  } catch (error) {
+    console.error('Failed to get badges with progress:', error)
+    return []
+  }
+}
+
