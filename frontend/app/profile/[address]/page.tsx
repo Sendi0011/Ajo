@@ -140,7 +140,20 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
           </Link>
         </Button>
 
-       
+        {/* Profile Header Card */}
+        <Card className="p-8 mb-6">
+          <div className="flex items-start gap-6">
+            {/* Avatar */}
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary text-3xl font-bold flex-shrink-0">
+              {profile.display_name 
+                ? profile.display_name.charAt(0).toUpperCase() 
+                : address.slice(2, 4).toUpperCase()
+              }
+            </div>
+            
+
+        </Card>
+      </div>
     </div>
   )
 }
