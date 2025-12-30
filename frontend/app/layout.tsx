@@ -24,7 +24,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <Web3Provider>
             {children}
-            {/* Add Toaster for notifications */}
+            {/* Add Toaster 4 notifications */}
             <Toaster position="top-right" />
           </Web3Provider>
         </Suspense>

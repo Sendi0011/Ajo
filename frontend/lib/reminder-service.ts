@@ -1,6 +1,4 @@
-// lib/reminder-service.ts
 // This service checks for upcoming payments and sends reminders
-
 interface ReminderPreferences {
     enabled: boolean
     threeDaysBefore: boolean
