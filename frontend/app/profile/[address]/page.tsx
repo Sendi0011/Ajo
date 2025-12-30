@@ -309,7 +309,36 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
           </Card>
         </div>
 
-        
+        {/* Pools Section */}
+        {pools.length > 0 && (
+          <div className="mt-6 space-y-4">
+            {/* Active Pools */}
+            {activePools.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  Active Groups ({activePools.length})
+                </h3>
+                <div className="space-y-2">
+                  {activePools.map((pool) => (
+                    <Link key={pool.id} href={`/dashboard/group/${pool.pools.id}`}>
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                        <div>
+                          <p className="font-medium">{pool.pools.name}</p>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {pool.pools.type} • Joined {new Date(pool.joined_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="capitalize">
+                          {pool.status}
+                        </Badge>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            
           </div>
         </Card>
       </div>
