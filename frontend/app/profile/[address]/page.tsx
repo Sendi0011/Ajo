@@ -338,9 +338,37 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
               </Card>
             )}
 
-            
+            {/* Completed Pools */}
+            {completedPools.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">
+                  Completed Groups ({completedPools.length})
+                </h3>
+                <div className="space-y-2">
+                  {completedPools.map((pool) => (
+                    <div
+                      key={pool.id}
+                      className="flex items-center justify-between p-3 rounded-lg bg-muted/30"
+                    >
+                      <div>
+                        <p className="font-medium">{pool.pools.name}</p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {pool.pools.type}
+                        </p>
+                      </div>
+                      <Badge className="bg-green-500/10 text-green-500">
+                        <Trophy className="h-3 w-3 mr-1" />
+                        Completed
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
           </div>
-        </Card>
+        )}
+
+       
       </div>
     </div>
   )
