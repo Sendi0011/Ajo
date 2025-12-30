@@ -368,7 +368,29 @@ export default function PublicProfilePage({ params }: { params: Promise<{ addres
           </div>
         )}
 
-       
+        {/* Trust Indicators */}
+        <Card className="p-6 mt-6 bg-muted/30">
+          <h3 className="text-lg font-semibold mb-3">About This Member</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <div className={`h-2 w-2 rounded-full ${profile.reputation_score >= 75 ? 'bg-green-500' : 'bg-yellow-500'}`} />
+              <span>
+                {profile.reputation_score >= 90 && "Highly trusted member with excellent payment history"}
+                {profile.reputation_score >= 75 && profile.reputation_score < 90 && "Trusted member with good payment history"}
+                {profile.reputation_score >= 50 && profile.reputation_score < 75 && "Reliable member building their reputation"}
+                {profile.reputation_score < 50 && "New member building their reputation"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <span>Member for {Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24))} days</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <span>{profile.active_groups} active group{profile.active_groups !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   )
