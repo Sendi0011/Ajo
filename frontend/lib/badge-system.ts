@@ -279,3 +279,30 @@ export async function getUserBadgesWithProgress(walletAddress: string) {
   }
 }
 
+/**
+ * Example: Call this after important user actions
+ */
+export async function triggerBadgeCheck(walletAddress: string, action: string) {
+  console.log(`Checking badges for ${walletAddress} after action: ${action}`)
+  
+  const newBadges = await checkAndAwardBadges(walletAddress)
+  
+  if (newBadges.length > 0) {
+    console.log(`🎉 Awarded ${newBadges.length} new badge(s)!`, newBadges)
+    // You could trigger a notification here
+    return {
+      success: true,
+      newBadges,
+      message: `Congratulations! You earned ${newBadges.length} new badge(s)!`
+    }
+  }
+  
+  return {
+    success: true,
+    newBadges: [],
+    message: null
+  }
+}
+
+// Export for use in API routes
+export { BADGE_DEFINITIONS as badges }
