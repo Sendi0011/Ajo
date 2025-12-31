@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, ArrowUpRight, ArrowDownLeft, Check, AlertCircle } from "lucide-react"
 import { useAccount } from "wagmi"
+import { toast } from "sonner"
 import {
   useApproveToken,
   useRotationalDeposit,
@@ -17,6 +18,9 @@ import {
   useFlexibleWithdraw,
 } from "@/hooks/useBaseSafeContracts"
 import { EmergencyWithdrawalRequest, EmergencyRequestsList } from "@/components/group/emergency-withdrawal"
+import { QRInviteDialog } from "@/components/group/qr-invite-dialog"
+import { updateReputationAfterPayment } from "@/lib/supabase"
+import { triggerBadgeCheck } from "@/lib/badge-system"
 
 interface GroupActionsProps {
   groupId: string
@@ -24,6 +28,7 @@ interface GroupActionsProps {
   poolType: "rotational" | "target" | "flexible"
   tokenAddress: string
   totalMembers: number
+  poolName?: string
 }
 
 export function GroupActions({
@@ -32,6 +37,7 @@ export function GroupActions({
   poolType,
   tokenAddress,
   totalMembers,
+  poolName = "Savings Group",
 }: GroupActionsProps) {
   const { address } = useAccount()
   const [depositAmount, setDepositAmount] = useState("")
@@ -57,6 +63,54 @@ export function GroupActions({
       setIsApproving(false)
     }
   }, [approveToken.isSuccess])
+
+  // Handle successful deposits - Update reputation
+  useEffect(() => {
+    const handleDepositSuccess = async () => {
+      if (!address) return
+
+      let isSuccess = false
+      if (poolType === "rotational" && rotationalDeposit.isSuccess) {
+        isSuccess = true
+      } else if (poolType === "target" && targetContribute.isSuccess) {
+        isSuccess = true
+      } else if (poolType === "flexible" && flexibleDeposit.isSuccess) {
+        isSuccess = true
+      }
+
+      if (isSuccess) {
+        try {
+          // Update reputation (assuming on-time since they just deposited)
+          await updateReputationAfterPayment(address, groupId, true)
+          
+          // Check for new badges
+          const badgeResult = await triggerBadgeCheck(address, 'payment_made')
+          
+          if (badgeResult.newBadges && badgeResult.newBadges.length > 0) {
+            toast.success(`🎉 You earned ${badgeResult.newBadges.length} new badge(s)!`)
+          } else {
+            toast.success("Deposit successful! Reputation updated.")
+          }
+
+          // Reset form
+          setDepositAmount("")
+          setApproved(false)
+        } catch (error) {
+          console.error("Failed to update reputation:", error)
+          toast.success("Deposit successful!")
+        }
+      }
+    }
+
+    handleDepositSuccess()
+  }, [
+    rotationalDeposit.isSuccess,
+    targetContribute.isSuccess,
+    flexibleDeposit.isSuccess,
+    address,
+    groupId,
+    poolType
+  ])
 
   const handleApproveAndDeposit = async () => {
     setError("")
@@ -125,6 +179,17 @@ export function GroupActions({
 
   return (
     <div className="space-y-6">
+      {/* Invite Card - NEW */}
+      <Card className="p-4 bg-primary/5 border-primary/20">
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Invite Members</p>
+          <p className="text-xs text-muted-foreground">
+            Share this group with friends using QR codes or invite links
+          </p>
+          <QRInviteDialog poolId={groupId} poolName={poolName} />
+        </div>
+      </Card>
+
       <Card className="p-6">
         <Tabs defaultValue="actions" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -246,6 +311,16 @@ export function GroupActions({
               <p className="text-sm font-mono bg-muted/30 p-2 rounded break-all">
                 {address || "Not connected"}
               </p>
+            </div>
+
+            {/* Reputation Info - NEW */}
+            <div className="border-t border-border pt-6 bg-muted/30 p-4 rounded-lg">
+              <p className="text-xs font-semibold mb-2">💡 Earn Reputation</p>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                <li>• On-time deposits: <strong>+5 reputation points</strong></li>
+                <li>• Complete this group: <strong>+10 reputation points</strong></li>
+                <li>• Unlock badges and premium features</li>
+              </ul>
             </div>
           </TabsContent>
 
