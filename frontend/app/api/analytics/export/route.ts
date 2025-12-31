@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
       .eq('member_address', userAddress.toLowerCase())
 
     if (format === 'csv') {
-      const csv = generateCSV(activities, pools, userAddress)
+      const csv = generateCSV(activities || [], pools || [], userAddress)
       return new NextResponse(csv, {
         headers: {
           'Content-Type': 'text/csv',
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
       })
     } else if (format === 'pdf') {
       // For PDF, we'll return HTML that can be printed/converted to PDF
-      const html = generatePDFHTML(activities, pools, userAddress)
+      const html = generatePDFHTML(activities || [], pools || [], userAddress)
       return new NextResponse(html, {
         headers: {
           'Content-Type': 'text/html',
@@ -82,7 +82,7 @@ function generateCSV(activities: any[], pools: any[], userAddress: string): stri
   // Pools Summary
   lines.push(`Pool Summary`)
   lines.push(`Pool Name,Type,Status,Total Saved,Target,Progress`)
-  pools?.forEach((p) => {
+  pools.forEach((p) => {
     const pool = p.pools
     lines.push(
       `"${pool.name}",${pool.type},${pool.status},${pool.total_saved || 0},${pool.target_amount || 'N/A'},${pool.progress || 0}%`
@@ -93,7 +93,7 @@ function generateCSV(activities: any[], pools: any[], userAddress: string): stri
   // Activities
   lines.push(`Activity History`)
   lines.push(`Date,Pool,Activity Type,Amount,Description`)
-  activities?.forEach((a) => {
+  activities.forEach((a) => {
     const pool = a.pools?.name || 'Unknown'
     const date = new Date(a.created_at).toLocaleDateString()
     const amount = a.amount ? `${a.amount} ETH` : 'N/A'
@@ -108,9 +108,9 @@ function generateCSV(activities: any[], pools: any[], userAddress: string): stri
 
 // Generate PDF-ready HTML
 function generatePDFHTML(activities: any[], pools: any[], userAddress: string): string {
-  const totalSaved = pools?.reduce((sum, p) => sum + (p.pools?.total_saved || 0), 0) || 0
-  const activePoolsCount = pools?.filter((p) => p.pools?.status === 'active').length || 0
-  const completedPoolsCount = pools?.filter((p) => p.pools?.status === 'completed').length || 0
+  const totalSaved = pools.reduce((sum, p) => sum + (p.pools?.total_saved || 0), 0)
+  const activePoolsCount = pools.filter((p) => p.pools?.status === 'active').length
+  const completedPoolsCount = pools.filter((p) => p.pools?.status === 'completed').length
 
   return `
 <!DOCTYPE html>
@@ -236,7 +236,7 @@ function generatePDFHTML(activities: any[], pools: any[], userAddress: string): 
       </tr>
     </thead>
     <tbody>
-      ${pools?.map((p) => `
+      ${pools.map((p) => `
         <tr>
           <td>${p.pools?.name || 'Unknown'}</td>
           <td>${p.pools?.type || 'N/A'}</td>
@@ -259,7 +259,7 @@ function generatePDFHTML(activities: any[], pools: any[], userAddress: string): 
       </tr>
     </thead>
     <tbody>
-      ${activities?.slice(0, 20).map((a) => `
+      ${activities.slice(0, 20).map((a) => `
         <tr>
           <td>${new Date(a.created_at).toLocaleDateString()}</td>
           <td>${a.pools?.name || 'Unknown'}</td>
