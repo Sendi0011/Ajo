@@ -108,7 +108,7 @@ export async function checkAndAwardBadges(walletAddress: string) {
 
     if (profileError || !profile) {
       console.error('Failed to fetch profile:', profileError)
-      return
+      return []
     }
 
     // Fetch existing badges
@@ -287,6 +287,7 @@ export async function triggerBadgeCheck(walletAddress: string, action: string) {
   
   const newBadges = await checkAndAwardBadges(walletAddress)
   
+  // newBadges is now guaranteed to be an array (never undefined)
   if (newBadges.length > 0) {
     console.log(`🎉 Awarded ${newBadges.length} new badge(s)!`, newBadges)
     // You could trigger a notification here
