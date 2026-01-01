@@ -193,3 +193,54 @@ export async function PATCH(req: NextRequest) {
   }
 }
 
+/**
+ * GET - Get payment history for a member or pool
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const memberAddress = req.nextUrl.searchParams.get('member')
+    const poolId = req.nextUrl.searchParams.get('poolId')
+
+    if (!memberAddress && !poolId) {
+      return NextResponse.json(
+        { error: 'Provide either member or poolId parameter' },
+        { status: 400 }
+      )
+    }
+
+    let query = supabase
+      .from('pool_activity')
+      .select(`
+        *,
+        pools:pool_id (
+          id,
+          name,
+          type
+        )
+      `)
+      .in('activity_type', ['payment_made', 'payment_late', 'payment_missed'])
+      .order('created_at', { ascending: false })
+
+    if (memberAddress) {
+      query = query.eq('user_address', memberAddress.toLowerCase())
+    }
+
+    if (poolId) {
+      query = query.eq('pool_id', poolId)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      throw error
+    }
+
+    return NextResponse.json(data || [])
+  } catch (error) {
+    console.error('Payment history fetch error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
