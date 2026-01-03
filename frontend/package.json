@@ -50,6 +50,8 @@
     "@tanstack/react-query": "latest",
     "@vercel/analytics": "latest",
     "@wagmi/core": "latest",
+    "@xmtp/react-sdk": "^9.0.0",
+    "@xmtp/xmtp-js": "^13.0.4",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
