@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardTabs } from "@/components/dashboard/dashboard-tabs"
 import { CompactActivityFeed } from "@/components/activity/activity-feed"
+import { UpcomingPaymentsWidget } from "@/components/calendar/upcoming-payments-widget"
 import { useEffect } from "react"
 
 export default function DashboardPage() {
@@ -33,6 +34,7 @@ export default function DashboardPage() {
           {/* Sidebar - 1 column */}
           <div className="space-y-6">
             <CompactActivityFeed />
+            <UpcomingPaymentsWidget />
           </div>
         </div>
       </main>
