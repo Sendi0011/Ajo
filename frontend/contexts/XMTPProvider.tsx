@@ -29,3 +29,72 @@ export function useXMTP() {
   return context
 }
 
+export function XMTPProvider({ children }: { children: ReactNode }) {
+  const { address, isConnected } = useAccount()
+  const { data: walletClient } = useWalletClient()
+  const [client, setClient] = useState<Client | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  const initializeClient = async () => {
+    if (!address || !walletClient || !isConnected) {
+      setError('Wallet not connected')
+      return
+    }
+
+    if (client) {
+      // Already initialized
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Create XMTP client with the wallet
+      const xmtpClient = await Client.create(walletClient as any, {
+        env: 'production', // or 'dev' for testing
+      })
+
+      setClient(xmtpClient)
+      setIsInitialized(true)
+      console.log('XMTP client initialized for:', address)
+    } catch (err: any) {
+      console.error('Failed to initialize XMTP:', err)
+      setError(err.message || 'Failed to initialize chat')
+      toast.error('Failed to initialize chat. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Auto-initialize when wallet connects
+  useEffect(() => {
+    if (isConnected && address && walletClient && !client && !isLoading) {
+      initializeClient()
+    }
+  }, [isConnected, address, walletClient])
+
+  // Cleanup on disconnect
+  useEffect(() => {
+    if (!isConnected && client) {
+      setClient(null)
+      setIsInitialized(false)
+    }
+  }, [isConnected])
+
+  return (
+    <XMTPContext.Provider
+      value={{
+        client,
+        isLoading,
+        error,
+        initializeClient,
+        isInitialized,
+      }}
+    >
+      {children}
+    </XMTPContext.Provider>
+  )
+}
