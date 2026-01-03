@@ -128,5 +128,34 @@ export function ChatMessages({ poolId, poolName, memberAddresses, client }: Chat
     )
   }
 
-  
+  return (
+    <ScrollArea className="flex-1 px-4" ref={scrollRef as any}>
+      <div className="space-y-4 py-4">
+        {messages.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-muted-foreground">
+              No messages yet. Start the conversation! 💬
+            </p>
+          </div>
+        ) : (
+          messages.map((message, index) => {
+            const prevMessage = index > 0 ? messages[index - 1] : null
+            const showAvatar = !prevMessage || 
+              prevMessage.senderAddress !== message.senderAddress ||
+              (message.timestamp.getTime() - prevMessage.timestamp.getTime()) > 300000 // 5 min
+
+            return (
+              <ChatMessage
+                key={message.id}
+                message={message}
+                isOwnMessage={message.senderAddress.toLowerCase() === address?.toLowerCase()}
+                showAvatar={showAvatar}
+                poolId={poolId}
+              />
+            )
+          })
+        )}
+      </div>
+    </ScrollArea>
+  )
 }
