@@ -130,5 +130,85 @@ export function ChatInput({ poolId, memberAddresses, client }: ChatInputProps) {
     // Will open file picker
   }
 
-  
+  return (
+    <div className="space-y-2">
+      {/* Mention suggestions */}
+      {showMentions && filteredMembers.length > 0 && (
+        <div className="bg-popover border rounded-lg shadow-lg p-2 space-y-1 max-h-48 overflow-y-auto">
+          {filteredMembers.slice(0, 5).map((addr) => (
+            <button
+              key={addr}
+              onClick={() => insertMention(addr)}
+              className="w-full text-left px-3 py-2 rounded hover:bg-muted transition-colors text-sm font-mono"
+            >
+              {addr.slice(0, 6)}...{addr.slice(-4)}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
+          <Textarea
+            ref={textareaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type a message... (@mention members)"
+            className="min-h-[60px] max-h-32 resize-none pr-24"
+            disabled={isSending}
+          />
+          
+          <div className="absolute right-2 bottom-2 flex gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => toast.info('Emoji picker coming soon! 😊')}
+            >
+              <Smile className="h-4 w-4" />
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                >
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={attachFile}>
+                  <Paperclip className="h-4 w-4 mr-2" />
+                  Attach File
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={createPoll}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Create Poll
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        <Button
+          onClick={handleSend}
+          disabled={!message.trim() || isSending}
+          size="icon"
+          className="h-[60px] w-12"
+        >
+          <Send className="h-5 w-5" />
+        </Button>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        Press <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Enter</kbd> to send, 
+        <kbd className="px-1 py-0.5 bg-muted rounded text-xs ml-1">Shift+Enter</kbd> for new line
+      </p>
+    </div>
+  )
 }
