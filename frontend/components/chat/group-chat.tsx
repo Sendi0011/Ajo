@@ -20,3 +20,36 @@ interface GroupChatProps {
   memberAddresses: string[]
 }
 
+export function GroupChat({ poolId, poolName, memberAddresses }: GroupChatProps) {
+  const { address } = useAccount()
+  const { client, isLoading: xmtpLoading, initializeClient, isInitialized } = useXMTP()
+  const [isOpen, setIsOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [activeTab, setActiveTab] = useState<'chat' | 'pinned' | 'members'>('chat')
+
+  // Initialize XMTP when chat is opened
+  useEffect(() => {
+    if (isOpen && !isInitialized && address) {
+      initializeClient()
+    }
+  }, [isOpen, isInitialized, address])
+
+  // Simulate unread count (in real app, this would come from read receipts)
+  useEffect(() => {
+    if (!isOpen) {
+      // Could fetch actual unread count from API
+      // For now, just demonstration
+    }
+  }, [isOpen])
+
+  const handleOpenChat = () => {
+    if (!address) {
+      toast.error('Please connect your wallet first')
+      return
+    }
+    setIsOpen(true)
+    setUnreadCount(0) // Clear unread when opened
+  }
+
+  
+}
