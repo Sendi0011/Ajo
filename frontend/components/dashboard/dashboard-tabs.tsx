@@ -10,6 +10,7 @@ import { Home, PlusCircle, Receipt, User } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import { BarChart3 } from "lucide-react";
+import { Calendar } from "lucide-react"
 
 export function DashboardTabs() {
   const [activeTab, setActiveTab] = useState("groups");
@@ -46,6 +47,14 @@ export function DashboardTabs() {
         </Button>
       </Link>
       
+      <Link href="/dashboard/calendar">
+  <Button variant="outline">
+    <Calendar className="h-4 w-4 mr-2" />
+    Calendar
+  </Button>
+</Link>
+
+
       <TabsContent value="groups" className="mt-0">
         <MyGroups onCreateClick={handleCreateClick} />
       </TabsContent>
