@@ -1,161 +1,173 @@
 "use client"
 
-import { useEffect, useState, useRef } from 'react'
-import { Client, Conversation } from '@xmtp/xmtp-js'
-import { useAccount } from 'wagmi'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { ChatMessage } from './chat-message'
-import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { formatDistanceToNow } from 'date-fns'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu'
+import { MoreVertical, Pin, Reply, ThumbsUp, Smile } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { ChatMessage as ChatMessageType } from '@/types/chat'
+import { toast } from 'sonner'
 
-interface ChatMessagesProps {
+interface ChatMessageProps {
+  message: ChatMessageType
+  isOwnMessage: boolean
+  showAvatar: boolean
   poolId: string
-  poolName: string
-  memberAddresses: string[]
-  client: Client
 }
 
-export function ChatMessages({ poolId, poolName, memberAddresses, client }: ChatMessagesProps) {
-  const { address } = useAccount()
-  const [messages, setMessages] = useState<ChatMessageType[]>([])
-  const [conversation, setConversation] = useState<Conversation | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const scrollRef = useRef<HTMLDivElement>(null)
+export function ChatMessage({ message, isOwnMessage, showAvatar, poolId }: ChatMessageProps) {
+  const [showActions, setShowActions] = useState(false)
 
-  // Create a unique conversation topic for this pool
-  const conversationTopic = `ajo-pool-${poolId}`
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+  }
 
-  useEffect(() => {
-    if (!client || !address) return
+  const handlePinMessage = async () => {
+    try {
+      const response = await fetch('/api/chat/pins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pool_id: poolId,
+          message_id: message.id,
+          message_content: message.content,
+          message_sender: message.senderAddress,
+        }),
+      })
 
-    const initConversation = async () => {
-      try {
-        setIsLoading(true)
-
-        // In XMTP, we need to create a group conversation
-        // For now, we'll use a simple approach with the pool creator as the peer
-        // In production, you'd want to use XMTP's group messaging feature
-        
-        // Get or create conversation with all members
-        const conversations = await client.conversations.list()
-        let conv = conversations.find(c => c.context?.conversationId === conversationTopic)
-
-        if (!conv && memberAddresses.length > 0) {
-          // Create new conversation with the first other member
-          // Note: XMTP group messaging is still in development
-          // This is a simplified version for demonstration
-          const otherMember = memberAddresses.find(addr => addr.toLowerCase() !== address.toLowerCase())
-          if (otherMember) {
-            conv = await client.conversations.newConversation(otherMember, {
-              conversationId: conversationTopic,
-              metadata: {
-                poolId,
-                poolName,
-              }
-            })
-          }
-        }
-
-        if (conv) {
-          setConversation(conv)
-          
-          // Load existing messages
-          const existingMessages = await conv.messages()
-          const formattedMessages: ChatMessageType[] = existingMessages.map((msg) => ({
-            id: msg.id,
-            senderAddress: msg.senderAddress,
-            content: msg.content,
-            timestamp: msg.sent,
-            contentType: msg.contentType.toString(),
-          }))
-          setMessages(formattedMessages.reverse())
-
-          // Stream new messages
-          const stream = await conv.streamMessages()
-          for await (const message of stream) {
-            const newMessage: ChatMessageType = {
-              id: message.id,
-              senderAddress: message.senderAddress,
-              content: message.content,
-              timestamp: message.sent,
-              contentType: message.contentType.toString(),
-            }
-            setMessages(prev => [...prev, newMessage])
-            scrollToBottom()
-          }
-        }
-      } catch (error) {
-        console.error('Failed to initialize conversation:', error)
-      } finally {
-        setIsLoading(false)
+      if (response.ok) {
+        toast.success('Message pinned!')
+      } else {
+        toast.error('Failed to pin message')
       }
-    }
-
-    initConversation()
-  }, [client, address, conversationTopic, poolId, poolName, memberAddresses])
-
-  // Auto-scroll to bottom on new messages
-  const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    } catch (error) {
+      console.error('Failed to pin message:', error)
+      toast.error('Failed to pin message')
     }
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Loading messages...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!conversation) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Be the first to start the conversation! 👋
-          </p>
-        </div>
-      </div>
-    )
+  const handleReaction = (emoji: string) => {
+    toast.success(`Reacted with ${emoji}`)
+    // In production, store reactions in database or XMTP metadata
   }
 
   return (
-    <ScrollArea className="flex-1 px-4" ref={scrollRef as any}>
-      <div className="space-y-4 py-4">
-        {messages.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-sm text-muted-foreground">
-              No messages yet. Start the conversation! 💬
-            </p>
-          </div>
-        ) : (
-          messages.map((message, index) => {
-            const prevMessage = index > 0 ? messages[index - 1] : null
-            const showAvatar = !prevMessage || 
-              prevMessage.senderAddress !== message.senderAddress ||
-              (message.timestamp.getTime() - prevMessage.timestamp.getTime()) > 300000 // 5 min
+    <div
+      className={cn(
+        "flex gap-3 group",
+        isOwnMessage && "flex-row-reverse"
+      )}
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      {showAvatar && (
+        <Avatar className="h-8 w-8 flex-shrink-0">
+          <AvatarFallback className="bg-primary/10 text-primary text-xs">
+            {message.senderAddress.slice(2, 4).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      )}
+      
+      {!showAvatar && <div className="h-8 w-8 flex-shrink-0" />}
 
-            return (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                isOwnMessage={message.senderAddress.toLowerCase() === address?.toLowerCase()}
-                showAvatar={showAvatar}
-                poolId={poolId}
-              />
-            )
-          })
+      <div className={cn("flex-1 space-y-1", isOwnMessage && "text-right")}>
+        {showAvatar && (
+          <div className={cn("flex items-center gap-2 text-xs", isOwnMessage && "justify-end")}>
+            <span className="font-medium font-mono">
+              {formatAddress(message.senderAddress)}
+            </span>
+            <span className="text-muted-foreground">
+              {formatDistanceToNow(message.timestamp, { addSuffix: true })}
+            </span>
+          </div>
+        )}
+
+        <div className={cn("flex gap-2 items-start", isOwnMessage && "justify-end")}>
+          <div
+            className={cn(
+              "rounded-2xl px-4 py-2 max-w-[80%] break-words",
+              isOwnMessage
+                ? "bg-primary text-primary-foreground rounded-tr-sm"
+                : "bg-muted rounded-tl-sm"
+            )}
+          >
+            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            
+            {message.isPinned && (
+              <div className="mt-2 pt-2 border-t border-current/20">
+                <Badge variant="secondary" className="text-xs">
+                  <Pin className="h-3 w-3 mr-1" />
+                  Pinned
+                </Badge>
+              </div>
+            )}
+          </div>
+
+          {showActions && (
+            <div className={cn(
+              "opacity-0 group-hover:opacity-100 transition-opacity flex gap-1",
+              isOwnMessage && "flex-row-reverse"
+            )}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => handleReaction('👍')}
+              >
+                <ThumbsUp className="h-3 w-3" />
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <MoreVertical className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={isOwnMessage ? "end" : "start"}>
+                  <DropdownMenuItem onClick={() => handleReaction('😊')}>
+                    <Smile className="h-4 w-4 mr-2" />
+                    React
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => toast.info('Reply feature coming soon!')}>
+                    <Reply className="h-4 w-4 mr-2" />
+                    Reply
+                  </DropdownMenuItem>
+                  {!isOwnMessage && (
+                    <DropdownMenuItem onClick={handlePinMessage}>
+                      <Pin className="h-4 w-4 mr-2" />
+                      Pin Message
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
+
+        {/* Reactions (if any) */}
+        {message.reactions && message.reactions.length > 0 && (
+          <div className={cn("flex gap-1 mt-1", isOwnMessage && "justify-end")}>
+            {message.reactions.map((reaction, idx) => (
+              <button
+                key={idx}
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted hover:bg-muted/80 text-xs transition-colors"
+                onClick={() => handleReaction(reaction.emoji)}
+              >
+                <span>{reaction.emoji}</span>
+                <span className="text-muted-foreground">{reaction.count}</span>
+              </button>
+            ))}
+          </div>
         )}
       </div>
-    </ScrollArea>
+    </div>
   )
 }
