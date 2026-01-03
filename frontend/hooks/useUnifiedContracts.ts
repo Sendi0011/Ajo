@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useSmartAccount } from "./useSmartAccount";
+import { usePaymentTracker } from "./usePaymentTracker";
 
 // Import EOA hooks
 import * as EOAHooks from "./useBaseSafeContracts";
@@ -137,22 +138,48 @@ export function useUnifiedApproveToken(spender: string, amount: string) {
   return isSmartAccountReady ? smartHook : eoaHook;
 }
 
-export function useUnifiedRotationalDeposit(poolAddress: string) {
+// ENHANCED: Deposit hooks now track payments automatically
+export function useUnifiedRotationalDeposit(poolAddress: string, poolId: string) {
   const { isSmartAccountReady } = useAccountMode();
+  const { address } = useAccount();
 
   const eoaHook = EOAHooks.useRotationalDeposit(poolAddress);
   const smartHook = SmartHooks.useSmartRotationalDeposit(poolAddress);
 
-  return isSmartAccountReady ? smartHook : eoaHook;
+  const baseHook = isSmartAccountReady ? smartHook : eoaHook;
+
+  // Track payment automatically when successful
+  usePaymentTracker({
+    poolId,
+    memberAddress: address,
+    txHash: baseHook.hash,
+    wasOnTime: true,
+    isSuccess: baseHook.isSuccess,
+  });
+
+  return baseHook;
 }
 
-export function useUnifiedTargetContribute(poolAddress: string, amount: string) {
+export function useUnifiedTargetContribute(poolAddress: string, amount: string, poolId: string) {
   const { isSmartAccountReady } = useAccountMode();
+  const { address } = useAccount();
 
   const eoaHook = EOAHooks.useTargetContribute(poolAddress, amount);
   const smartHook = SmartHooks.useSmartTargetContribute(poolAddress, amount);
 
-  return isSmartAccountReady ? smartHook : eoaHook;
+  const baseHook = isSmartAccountReady ? smartHook : eoaHook;
+
+  // Track payment automatically when successful
+  usePaymentTracker({
+    poolId,
+    memberAddress: address,
+    amount,
+    txHash: baseHook.hash,
+    wasOnTime: true,
+    isSuccess: baseHook.isSuccess,
+  });
+
+  return baseHook;
 }
 
 export function useUnifiedTargetWithdraw(poolAddress: string) {
@@ -164,13 +191,26 @@ export function useUnifiedTargetWithdraw(poolAddress: string) {
   return isSmartAccountReady ? smartHook : eoaHook;
 }
 
-export function useUnifiedFlexibleDeposit(poolAddress: string, amount: string) {
+export function useUnifiedFlexibleDeposit(poolAddress: string, amount: string, poolId: string) {
   const { isSmartAccountReady } = useAccountMode();
+  const { address } = useAccount();
 
   const eoaHook = EOAHooks.useFlexibleDeposit(poolAddress, amount);
   const smartHook = SmartHooks.useSmartFlexibleDeposit(poolAddress, amount);
 
-  return isSmartAccountReady ? smartHook : eoaHook;
+  const baseHook = isSmartAccountReady ? smartHook : eoaHook;
+
+  // Track payment automatically when successful
+  usePaymentTracker({
+    poolId,
+    memberAddress: address,
+    amount,
+    txHash: baseHook.hash,
+    wasOnTime: true,
+    isSuccess: baseHook.isSuccess,
+  });
+
+  return baseHook;
 }
 
 export function useUnifiedFlexibleWithdraw(poolAddress: string, amount: string) {
