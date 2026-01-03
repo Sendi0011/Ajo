@@ -49,7 +49,7 @@ export function GroupActions({
   // Approval hook
   const approveToken = useUnifiedApproveToken(poolAddress, depositAmount)
 
-  // Pool-specific hooks (now with automatic payment tracking!)
+  // Pool-specific hooks with automatic payment tracking!
   const rotationalDeposit = useUnifiedRotationalDeposit(poolAddress, groupId)
   const targetContribute = useUnifiedTargetContribute(poolAddress, depositAmount, groupId)
   const targetWithdraw = useUnifiedTargetWithdraw(poolAddress)
