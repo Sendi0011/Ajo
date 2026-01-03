@@ -10,13 +10,13 @@ import { Loader2, ArrowUpRight, ArrowDownLeft, Check, AlertCircle } from "lucide
 import { useAccount } from "wagmi"
 import { toast } from "sonner"
 import {
-  useApproveToken,
-  useRotationalDeposit,
-  useTargetContribute,
-  useTargetWithdraw,
-  useFlexibleDeposit,
-  useFlexibleWithdraw,
-} from "@/hooks/useBaseSafeContracts"
+  useUnifiedApproveToken,
+  useUnifiedRotationalDeposit,
+  useUnifiedTargetContribute,
+  useUnifiedTargetWithdraw,
+  useUnifiedFlexibleDeposit,
+  useUnifiedFlexibleWithdraw,
+} from "@/hooks/useUnifiedContracts"
 import { EmergencyWithdrawalRequest, EmergencyRequestsList } from "@/components/group/emergency-withdrawal"
 import { QRInviteDialog } from "@/components/group/qr-invite-dialog"
 import { updateReputationAfterPayment } from "@/lib/supabase"
@@ -47,14 +47,14 @@ export function GroupActions({
   const [error, setError] = useState("")
 
   // Approval hook
-  const approveToken = useApproveToken(poolAddress, depositAmount)
+  const approveToken = useUnifiedApproveToken(poolAddress, depositAmount)
 
-  // Pool-specific hooks
-  const rotationalDeposit = useRotationalDeposit(poolAddress)
-  const targetContribute = useTargetContribute(poolAddress, depositAmount)
-  const targetWithdraw = useTargetWithdraw(poolAddress)
-  const flexibleDeposit = useFlexibleDeposit(poolAddress, depositAmount)
-  const flexibleWithdraw = useFlexibleWithdraw(poolAddress, withdrawAmount)
+  // Pool-specific hooks (now with automatic payment tracking!)
+  const rotationalDeposit = useUnifiedRotationalDeposit(poolAddress, groupId)
+  const targetContribute = useUnifiedTargetContribute(poolAddress, depositAmount, groupId)
+  const targetWithdraw = useUnifiedTargetWithdraw(poolAddress)
+  const flexibleDeposit = useUnifiedFlexibleDeposit(poolAddress, depositAmount, groupId)
+  const flexibleWithdraw = useUnifiedFlexibleWithdraw(poolAddress, withdrawAmount)
 
   // Handle approval + transaction flow
   useEffect(() => {
@@ -65,6 +65,8 @@ export function GroupActions({
   }, [approveToken.isSuccess])
 
   // Handle successful deposits - Update reputation
+  // NOTE: Reputation updates now happen automatically via useUnifiedContracts!
+  // This useEffect is kept for showing toast notifications
   useEffect(() => {
     const handleDepositSuccess = async () => {
       if (!address) return
@@ -79,26 +81,13 @@ export function GroupActions({
       }
 
       if (isSuccess) {
-        try {
-          // Update reputation (assuming on-time since they just deposited)
-          await updateReputationAfterPayment(address, groupId, true)
-          
-          // Check for new badges
-          const badgeResult = await triggerBadgeCheck(address, 'payment_made')
-          
-          if (badgeResult.newBadges && badgeResult.newBadges.length > 0) {
-            toast.success(`🎉 You earned ${badgeResult.newBadges.length} new badge(s)!`)
-          } else {
-            toast.success("Deposit successful! Reputation updated.")
-          }
-
-          // Reset form
-          setDepositAmount("")
-          setApproved(false)
-        } catch (error) {
-          console.error("Failed to update reputation:", error)
-          toast.success("Deposit successful!")
-        }
+        // Reputation already updated by usePaymentTracker in unified hooks
+        // Just show success message
+        toast.success("Deposit successful! Reputation updated.")
+        
+        // Reset form
+        setDepositAmount("")
+        setApproved(false)
       }
     }
 
