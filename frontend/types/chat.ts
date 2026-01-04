@@ -1,11 +1,9 @@
-import { DecodedMessage } from '@xmtp/react-sdk'
-
-export interface ChatMessage extends DecodedMessage {
+export interface ChatMessage {
   id: string
   senderAddress: string
   content: string
   timestamp: Date
-  contentType: string
+  contentType?: any
   isPinned?: boolean
   reactions?: MessageReaction[]
   replyTo?: string
