@@ -49,3 +49,33 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// GET - Fetch pinned messages for a pool
+export async function GET(req: NextRequest) {
+  try {
+    const poolId = req.nextUrl.searchParams.get('pool_id')
+
+    if (!poolId) {
+      return NextResponse.json(
+        { error: 'Pool ID required' },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('chat_pinned_messages')
+      .select('*')
+      .eq('pool_id', poolId)
+      .order('pinned_at', { ascending: false })
+
+    if (error) throw error
+
+    return NextResponse.json(data || [])
+  } catch (error) {
+    console.error('Fetch pinned messages error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
