@@ -79,3 +79,31 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// DELETE - Unpin a message
+export async function DELETE(req: NextRequest) {
+  try {
+    const messageId = req.nextUrl.searchParams.get('message_id')
+
+    if (!messageId) {
+      return NextResponse.json(
+        { error: 'Message ID required' },
+        { status: 400 }
+      )
+    }
+
+    const { error } = await supabase
+      .from('chat_pinned_messages')
+      .delete()
+      .eq('message_id', messageId)
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Unpin message error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
