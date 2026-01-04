@@ -80,5 +80,45 @@ export function ChatPinnedMessages({ poolId }: ChatPinnedMessagesProps) {
     )
   }
 
-  
+  return (
+    <ScrollArea className="h-full">
+      <div className="p-4 space-y-3">
+        {pinnedMessages.map((pinned) => (
+          <Card key={pinned.id} className="p-4">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  <Pin className="h-3 w-3 mr-1" />
+                  Pinned
+                </Badge>
+                <span className="text-xs text-muted-foreground font-mono">
+                  {formatAddress(pinned.message_sender)}
+                </span>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => handleUnpin(pinned.message_id)}
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+
+            <p className="text-sm mb-2 whitespace-pre-wrap">{pinned.message_content}</p>
+
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                Pinned by {formatAddress(pinned.pinned_by)}
+              </span>
+              <span>
+                {formatDistanceToNow(new Date(pinned.pinned_at), { addSuffix: true })}
+              </span>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </ScrollArea>
+  )
 }
