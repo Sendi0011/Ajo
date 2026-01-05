@@ -160,7 +160,31 @@ export function PollCard({ poll, onVoteUpdate }: PollCardProps) {
                   />
                 )}
 
-                
+                {/* Content */}
+                <div className="relative flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    {isUserChoice && (
+                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                    )}
+                    <span className="text-sm font-medium">{option.option_text}</span>
+                  </div>
+
+                  {(hasVoted || isClosed) && (
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-sm font-bold">{percentage}%</span>
+                      <span className="text-xs text-muted-foreground">
+                        ({option.vote_count})
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      
     </Card>
   )
 }
