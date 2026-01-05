@@ -124,3 +124,33 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// PATCH - Close a poll manually
+export async function PATCH(req: NextRequest) {
+  try {
+    const pollId = req.nextUrl.searchParams.get('poll_id')
+
+    if (!pollId) {
+      return NextResponse.json(
+        { error: 'Poll ID required' },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await supabase
+      .from('chat_polls')
+      .update({ is_active: false })
+      .eq('id', pollId)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Close poll error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
