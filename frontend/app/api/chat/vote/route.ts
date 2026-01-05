@@ -115,3 +115,33 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// DELETE - Remove vote (change vote)
+export async function DELETE(req: NextRequest) {
+  try {
+    const pollId = req.nextUrl.searchParams.get('poll_id')
+    const voterAddress = req.nextUrl.searchParams.get('voter_address')
+
+    if (!pollId || !voterAddress) {
+      return NextResponse.json(
+        { error: 'Poll ID and voter address required' },
+        { status: 400 }
+      )
+    }
+
+    const { error } = await supabase
+      .from('chat_poll_votes')
+      .delete()
+      .eq('poll_id', pollId)
+      .eq('voter_address', voterAddress.toLowerCase())
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Delete vote error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
