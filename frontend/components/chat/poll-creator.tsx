@@ -109,5 +109,117 @@ export function PollCreator({ poolId, onPollCreated }: PollCreatorProps) {
     setHoursUntilClose(24)
   }
 
-  
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="w-full justify-start">
+          <BarChart3 className="h-4 w-4 mr-2" />
+          Create Poll
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Create a Poll</DialogTitle>
+          <DialogDescription>
+            Ask a question and let members vote on the options
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Question */}
+          <div className="space-y-2">
+            <Label htmlFor="question">Question</Label>
+            <Input
+              id="question"
+              placeholder="What should we do?"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">
+              {question.length}/200 characters
+            </p>
+          </div>
+
+          {/* Options */}
+          <div className="space-y-2">
+            <Label>Options</Label>
+            <div className="space-y-2">
+              {options.map((option, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    placeholder={`Option ${index + 1}`}
+                    value={option}
+                    onChange={(e) => updateOption(index, e.target.value)}
+                    maxLength={100}
+                  />
+                  {options.length > 2 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeOption(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            {options.length < 6 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addOption}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Option
+              </Button>
+            )}
+          </div>
+
+          {/* Deadline */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="deadline">Set Deadline</Label>
+              <Switch
+                id="deadline"
+                checked={hasDeadline}
+                onCheckedChange={setHasDeadline}
+              />
+            </div>
+
+            {hasDeadline && (
+              <div className="space-y-2">
+                <Label htmlFor="hours">Close after (hours)</Label>
+                <Input
+                  id="hours"
+                  type="number"
+                  min={1}
+                  max={720}
+                  value={hoursUntilClose}
+                  onChange={(e) => setHoursUntilClose(parseInt(e.target.value) || 24)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Poll will close in {hoursUntilClose} hours (
+                  {new Date(Date.now() + hoursUntilClose * 60 * 60 * 1000).toLocaleString()}
+                  )
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleCreate} disabled={isCreating}>
+            {isCreating ? 'Creating...' : 'Create Poll'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }
