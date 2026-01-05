@@ -45,5 +45,67 @@ export function PollsList({ poolId }: PollsListProps) {
     )
   }
 
-  
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header with Create button */}
+      <div className="p-4 border-b">
+        <PollCreator poolId={poolId} onPollCreated={fetchPolls} />
+      </div>
+
+      {/* Polls list */}
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-3">
+          {polls.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <BarChart3 className="h-12 w-12 text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground mb-1">
+                No polls yet
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Create the first poll to gather group opinions
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Active polls */}
+              {polls.filter(p => p.is_active).length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Active Polls
+                  </h3>
+                  {polls
+                    .filter(p => p.is_active)
+                    .map(poll => (
+                      <PollCard
+                        key={poll.id}
+                        poll={poll}
+                        onVoteUpdate={fetchPolls}
+                      />
+                    ))}
+                </div>
+              )}
+
+              {/* Closed polls */}
+              {polls.filter(p => !p.is_active).length > 0 && (
+                <div className="space-y-3 mt-6">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Closed Polls
+                  </h3>
+                  {polls
+                    .filter(p => !p.is_active)
+                    .map(poll => (
+                      <PollCard
+                        key={poll.id}
+                        poll={poll}
+                        onVoteUpdate={fetchPolls}
+                      />
+                    ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
+  )
 }
