@@ -127,6 +127,27 @@ export function PollCard({ poll, onVoteUpdate }: PollCardProps) {
         )}
       </div>
 
-      
+      {/* Options */}
+      <div className="space-y-2">
+        {poll.options.map((option) => {
+          const percentage = getOptionPercentage(option.vote_count)
+          const isUserChoice = userVote?.option_id === option.id
+          const isSelected = selectedOption === option.id
+
+          return (
+            <div key={option.id} className="space-y-1">
+              <button
+                onClick={() => handleVote(option.id)}
+                disabled={isClosed || isVoting}
+                className={cn(
+                  "w-full text-left p-3 rounded-lg border transition-all relative overflow-hidden",
+                  "hover:border-primary hover:bg-primary/5",
+                  isUserChoice && "border-primary bg-primary/10",
+                  isClosed && "cursor-not-allowed opacity-70",
+                  isSelected && "opacity-50"
+                )}
+              >
+               
+    </Card>
   )
 }
