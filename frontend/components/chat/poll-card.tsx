@@ -94,5 +94,39 @@ export function PollCard({ poll, onVoteUpdate }: PollCardProps) {
     return Math.round((voteCount / totalVotes) * 100)
   }
 
-  
+  return (
+    <Card className="p-4 space-y-3">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-2 flex-1">
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <BarChart3 className="h-4 w-4 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-sm">{poll.question}</h4>
+            <p className="text-xs text-muted-foreground font-mono mt-1">
+              by {formatAddress(poll.creator_address)}
+            </p>
+          </div>
+        </div>
+
+        {isClosed ? (
+          <Badge variant="secondary" className="flex-shrink-0">
+            <Lock className="h-3 w-3 mr-1" />
+            Closed
+          </Badge>
+        ) : poll.closes_at ? (
+          <Badge variant="outline" className="flex-shrink-0">
+            <Clock className="h-3 w-3 mr-1" />
+            {formatDistanceToNow(new Date(poll.closes_at), { addSuffix: true })}
+          </Badge>
+        ) : (
+          <Badge className="flex-shrink-0 bg-green-500/10 text-green-500">
+            Active
+          </Badge>
+        )}
+      </div>
+
+      
+  )
 }
