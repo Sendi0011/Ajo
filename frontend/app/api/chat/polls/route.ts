@@ -66,3 +66,61 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// GET - Fetch polls for a pool
+export async function GET(req: NextRequest) {
+  try {
+    const poolId = req.nextUrl.searchParams.get('pool_id')
+    const pollId = req.nextUrl.searchParams.get('poll_id')
+
+    if (!poolId && !pollId) {
+      return NextResponse.json(
+        { error: 'Provide pool_id or poll_id' },
+        { status: 400 }
+      )
+    }
+
+    let query = supabase
+      .from('chat_polls')
+      .select(`
+        *,
+        options:chat_poll_options (
+          id,
+          option_text,
+          vote_count
+        ),
+        votes:chat_poll_votes (
+          id,
+          option_id,
+          voter_address,
+          voted_at
+        )
+      `)
+
+    if (pollId) {
+      query = query.eq('id', pollId).single()
+    } else if (poolId) {
+      query = query.eq('pool_id', poolId).order('created_at', { ascending: false })
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+      if (pollId && error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'Poll not found' },
+          { status: 404 }
+        )
+      }
+      throw error
+    }
+
+    return NextResponse.json(data || [])
+  } catch (error) {
+    console.error('Fetch polls error:', error)
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    )
+  }
+}
+
