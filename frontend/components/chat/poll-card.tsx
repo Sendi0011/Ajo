@@ -147,7 +147,20 @@ export function PollCard({ poll, onVoteUpdate }: PollCardProps) {
                   isSelected && "opacity-50"
                 )}
               >
-               
+                {/* Background progress bar */}
+                {(hasVoted || isClosed) && (
+                  <div
+                    className={cn(
+                      "absolute inset-0 transition-all duration-500",
+                      isUserChoice
+                        ? "bg-primary/20"
+                        : "bg-muted"
+                    )}
+                    style={{ width: `${percentage}%` }}
+                  />
+                )}
+
+                
     </Card>
   )
 }
