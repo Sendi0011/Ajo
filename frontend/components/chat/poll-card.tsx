@@ -184,7 +184,20 @@ export function PollCard({ poll, onVoteUpdate }: PollCardProps) {
         })}
       </div>
 
-      
+      {/* Footer */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+        <span>{totalVotes} vote{totalVotes !== 1 ? 's' : ''}</span>
+        <span>
+          Created {formatDistanceToNow(new Date(poll.created_at), { addSuffix: true })}
+        </span>
+      </div>
+
+      {/* Help text */}
+      {!hasVoted && !isClosed && (
+        <p className="text-xs text-muted-foreground text-center">
+          Click an option to vote
+        </p>
+      )}
     </Card>
   )
 }
