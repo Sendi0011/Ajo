@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MessageCircle, Users, Pin, Search, Settings } from 'lucide-react'
+import { MessageCircle, Users, Pin, Search, Settings, BarChart3 } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useXMTP } from '@/contexts/XMTPProvider'
 import { ChatMessages } from './chat-messages'
@@ -84,10 +84,14 @@ export function GroupChat({ poolId, poolName, memberAddresses }: GroupChatProps)
         </SheetHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-4 mt-2">
+          <TabsList className="grid w-full grid-cols-4 mx-4 mt-2">
             <TabsTrigger value="chat" className="text-xs">
               <MessageCircle className="h-3 w-3 mr-1" />
               Chat
+            </TabsTrigger>
+            <TabsTrigger value="polls" className="text-xs">
+              <BarChart3 className="h-3 w-3 mr-1" />
+              Polls
             </TabsTrigger>
             <TabsTrigger value="pinned" className="text-xs">
               <Pin className="h-3 w-3 mr-1" />
@@ -128,10 +132,15 @@ export function GroupChat({ poolId, poolName, memberAddresses }: GroupChatProps)
                     poolId={poolId}
                     memberAddresses={memberAddresses}
                     client={client}
+                    onPollCreated={() => setActiveTab('polls')}
                   />
                 </div>
               </>
             )}
+          </TabsContent>
+
+          <TabsContent value="polls" className="flex-1 m-0 p-0 overflow-hidden">
+            <PollsList poolId={poolId} />
           </TabsContent>
 
           <TabsContent value="pinned" className="flex-1 m-0 p-0 overflow-hidden">
