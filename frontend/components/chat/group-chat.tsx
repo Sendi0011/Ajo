@@ -11,6 +11,7 @@ import { ChatMessages } from './chat-messages'
 import { ChatInput } from './chat-input'
 import { ChatHeader } from './chat-header'
 import { ChatPinnedMessages } from './chat-pinned-messages'
+import { PollsList } from './polls-list'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 
@@ -25,7 +26,7 @@ export function GroupChat({ poolId, poolName, memberAddresses }: GroupChatProps)
   const { client, isLoading: xmtpLoading, initializeClient, isInitialized } = useXMTP()
   const [isOpen, setIsOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
-  const [activeTab, setActiveTab] = useState<'chat' | 'pinned' | 'members'>('chat')
+  const [activeTab, setActiveTab] = useState<'chat' | 'polls' | 'pinned' | 'members'>('chat')
 
   // Initialize XMTP when chat is opened
   useEffect(() => {
