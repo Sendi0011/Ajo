@@ -7,20 +7,21 @@ import { Textarea } from '@/components/ui/textarea'
 import { Send, Paperclip, Smile, BarChart3 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAccount } from 'wagmi'
+import { PollCreator } from './poll-creator'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 interface ChatInputProps {
   poolId: string
   memberAddresses: string[]
   client: Client
+  onPollCreated?: () => void
 }
 
-export function ChatInput({ poolId, memberAddresses, client }: ChatInputProps) {
+export function ChatInput({ poolId, memberAddresses, client, onPollCreated }: ChatInputProps) {
   const { address } = useAccount()
   const [message, setMessage] = useState('')
   const [isSending, setIsSending] = useState(false)
@@ -121,8 +122,7 @@ export function ChatInput({ poolId, memberAddresses, client }: ChatInputProps) {
   }
 
   const createPoll = () => {
-    toast.info('Poll creation coming soon! 📊')
-    // Will open poll creation dialog
+    // Poll creator is now in a popover
   }
 
   const attachFile = () => {
@@ -155,7 +155,7 @@ export function ChatInput({ poolId, memberAddresses, client }: ChatInputProps) {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message... (@mention members)"
-            className="min-h-[60px] max-h-32 resize-none pr-24"
+            className="min-h-[60px] max-h-32 resize-none pr-32"
             disabled={isSending}
           />
           
@@ -170,28 +170,31 @@ export function ChatInput({ poolId, memberAddresses, client }: ChatInputProps) {
               <Smile className="h-4 w-4" />
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={attachFile}
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7"
                 >
-                  <Paperclip className="h-4 w-4" />
+                  <BarChart3 className="h-4 w-4" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={attachFile}>
-                  <Paperclip className="h-4 w-4 mr-2" />
-                  Attach File
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={createPoll}>
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Create Poll
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0">
+                <PollCreator poolId={poolId} onPollCreated={onPollCreated} />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
