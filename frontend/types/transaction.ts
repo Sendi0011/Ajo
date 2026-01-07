@@ -78,3 +78,41 @@ export interface TransactionMetadata {
   // Custom fields
   [key: string]: any;
 }
+
+export interface PaginationParams {
+    page: number;
+    limit: number;
+    offset?: number;
+  }
+  
+  export interface PaginationMeta {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  }
+  
+  export interface TransactionListResponse {
+    transactions: Transaction[];
+    pagination: PaginationMeta;
+    filters?: FilterOptions;
+    stats?: TransactionStats;
+  }
+  
+  export interface TransactionStats {
+    totalTransactions: number;
+    totalVolume: string;
+    totalVolumeUSD: string;
+    averageAmount: string;
+    successRate: number;
+    byType: Record<TransactionType, number>;
+    byStatus: Record<TransactionStatus, number>;
+    byCategory: Record<TransactionCategory, number>;
+    recentActivity: {
+      last24h: number;
+      last7d: number;
+      last30d: number;
+    };
+  }
