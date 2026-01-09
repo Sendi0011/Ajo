@@ -62,7 +62,7 @@ export function useTransactionExport(): UseTransactionExportReturn {
         throw new Error('Export failed');
       }
 
-      // For now, we'll handle PDF generation differently
+      // For now, i'll handle PDF generation differently
       toast.info('PDF export will be available soon');
     } catch (error) {
       toast.error('Failed to export PDF');
