@@ -27,7 +27,7 @@ export function useSmartAccount() {
         return;
       }
 
-      // Check if we're on a supported chain
+      // Check if one is on a supported chain
       const chain = chainId === base.id ? base : chainId === baseSepolia.id ? baseSepolia : null;
 
       if (!chain) {

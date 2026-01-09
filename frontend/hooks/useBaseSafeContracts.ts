@@ -2,7 +2,7 @@ import { useContractWrite, useWaitForTransactionReceipt, usePublicClient } from 
 import { parseEther } from 'viem'
 import { useEffect, useState } from 'react'
 
-// Import ABIs as const
+
 const FACTORY_ABI = [
   {
     name: 'createRotational',
