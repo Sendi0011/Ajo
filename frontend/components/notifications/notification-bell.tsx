@@ -74,5 +74,28 @@ export function NotificationBell({ userAddress }: { userAddress: string }) {
     }
   };
 
-  
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <Badge
+              className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
+              variant="destructive"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Badge>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-96 p-0" align="end">
+        <NotificationList
+          userAddress={userAddress}
+          onClose={() => setIsOpen(false)}
+          onCountChange={setUnreadCount}
+        />
+      </PopoverContent>
+    </Popover>
+  );
 }
