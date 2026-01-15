@@ -1,66 +1,63 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabase } from '@/lib/supabase'
 
-// PATCH - Mark notification as read
 export async function PATCH(
-    req: NextRequest,
-    { params }: { params: { id: string } }
-  ) {
-    try {
-      const body = await req.json()
-      const { read } = body
-  
-      const { data, error } = await supabase
-        .from('notifications')
-        .update({ read })
-        .eq('id', params.id)
-        .select()
-        .single()
-  
-      if (error) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 500 }
-        )
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json();
+    const updates: any = {};
+
+    if (body.isRead !== undefined) {
+      updates.is_read = body.isRead;
+      if (body.isRead) {
+        updates.read_at = new Date().toISOString();
       }
-  
-      return NextResponse.json(data)
-    } catch (error) {
-      console.error('Notification update error:', error)
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 500 }
-      )
     }
-  }
-  
-  // DELETE - Delete notification
-  export async function DELETE(
-    req: NextRequest,
-    { params }: { params: { id: string } }
-  ) {
-    try {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', params.id)
-  
-      if (error) {
-        return NextResponse.json(
-          { error: error.message },
-          { status: 500 }
-        )
+
+    if (body.isArchived !== undefined) {
+      updates.is_archived = body.isArchived;
+      if (body.isArchived) {
+        updates.archived_at = new Date().toISOString();
       }
-  
-      return NextResponse.json({ success: true })
-    } catch (error) {
-      console.error('Notification delete error:', error)
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 500 }
-      )
     }
+
+    const { data, error } = await supabase
+      .from('notifications')
+      .update(updates)
+      .eq('id', params.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({ notification: data });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to update notification' },
+      { status: 500 }
+    );
   }
-  
-  
-  
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', params.id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to delete notification' },
+      { status: 500 }
+    );
+  }
+}
