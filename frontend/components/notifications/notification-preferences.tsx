@@ -189,7 +189,66 @@ export function NotificationPreferences({ userAddress }: NotificationPreferences
           </CardContent>
         </Card>
 
-        
+        {/* Quiet Hours */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Moon className="h-5 w-5" />
+              <CardTitle>Quiet Hours</CardTitle>
+            </div>
+            <CardDescription>
+              Pause non-urgent notifications during specific hours
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="quiet-enabled">Enable quiet hours</Label>
+              <Switch
+                id="quiet-enabled"
+                checked={localPrefs.quiet_hours_enabled}
+                onCheckedChange={(checked) =>
+                  setLocalPrefs({ ...localPrefs, quiet_hours_enabled: checked })
+                }
+              />
+            </div>
+
+            {localPrefs.quiet_hours_enabled && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quiet-start">Start time</Label>
+                  <Input
+                    id="quiet-start"
+                    type="time"
+                    value={localPrefs.quiet_hours_start}
+                    onChange={(e) =>
+                      setLocalPrefs({ ...localPrefs, quiet_hours_start: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="quiet-end">End time</Label>
+                  <Input
+                    id="quiet-end"
+                    type="time"
+                    value={localPrefs.quiet_hours_end}
+                    onChange={(e) =>
+                      setLocalPrefs({ ...localPrefs, quiet_hours_end: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button onClick={handleSave}>
+            Save Preferences
+          </Button>
+        </div>
       </div>
     </div>
   );
