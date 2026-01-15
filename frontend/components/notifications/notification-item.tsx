@@ -113,5 +113,91 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
 
   if (isDeleting) return null;
 
-  
+  return (
+    <div
+      className={`flex items-start gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
+        !notification.isRead ? 'bg-primary/5' : ''
+      }`}
+      onClick={handleClick}
+    >
+      {/* Icon */}
+      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${getIconColor()}`}>
+        {getIcon()}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1">
+            <p className={`font-medium ${!notification.isRead ? 'font-semibold' : ''}`}>
+              {notification.title}
+            </p>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {notification.message}
+            </p>
+          </div>
+          
+          {/* Priority Badge */}
+          {notification.priority === 'URGENT' && (
+            <Badge variant="destructive" className="text-xs">
+              Urgent
+            </Badge>
+          )}
+        </div>
+
+        {/* Metadata */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {notification.metadata?.poolName && (
+            <>
+              <span>{notification.metadata.poolName}</span>
+              <span>•</span>
+            </>
+          )}
+          <span>{formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}</span>
+          {!notification.isRead && (
+            <>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                New
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Action Button */}
+        {notification.actionLabel && notification.actionUrl && (
+          <Button variant="outline" size="sm" className="mt-2">
+            {notification.actionLabel}
+            <ExternalLink className="ml-1 h-3 w-3" />
+          </Button>
+        )}
+      </div>
+
+      {/* More Actions */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {!notification.isRead && (
+            <DropdownMenuItem onClick={() => markAsRead(notification.id)}>
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Mark as read
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem onClick={handleArchive}>
+            <Archive className="mr-2 h-4 w-4" />
+            Archive
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+            <Trash className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
 }
