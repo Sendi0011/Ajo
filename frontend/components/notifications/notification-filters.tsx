@@ -44,5 +44,54 @@ export function NotificationFilters({ filters, onChange }: NotificationFiltersPr
     onChange({ ...filters, priorities: newPriorities });
   };
 
-  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Filters</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Type Filters */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium">Type</h4>
+          {NOTIFICATION_TYPES.map((type) => (
+            <div key={type.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={type.value}
+                checked={filters.types?.includes(type.value)}
+                onCheckedChange={() => toggleType(type.value)}
+              />
+              <Label
+                htmlFor={type.value}
+                className="text-sm font-normal cursor-pointer"
+              >
+                {type.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+
+        <Separator />
+
+        {/* Priority Filters */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium">Priority</h4>
+          {PRIORITIES.map((priority) => (
+            <div key={priority.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={priority.value}
+                checked={filters.priorities?.includes(priority.value)}
+                onCheckedChange={() => togglePriority(priority.value)}
+              />
+              <Label
+                htmlFor={priority.value}
+                className="text-sm font-normal cursor-pointer"
+              >
+                {priority.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
