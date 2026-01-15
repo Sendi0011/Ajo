@@ -16,3 +16,24 @@ interface NotificationPreferencesProps {
   userAddress: string;
 }
 
+export function NotificationPreferences({ userAddress }: NotificationPreferencesProps) {
+  const { preferences, loading, updatePreferences } = useNotificationPreferences(userAddress);
+  const [localPrefs, setLocalPrefs] = useState<any>({});
+
+  useEffect(() => {
+    if (preferences) {
+      setLocalPrefs(preferences);
+    }
+  }, [preferences]);
+
+  const handleSave = async () => {
+    await updatePreferences(localPrefs);
+    toast.success('Preferences saved successfully');
+  };
+
+  if (loading) {
+    return <div>Loading preferences...</div>;
+  }
+
+  
+}
