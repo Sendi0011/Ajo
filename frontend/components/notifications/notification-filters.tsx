@@ -27,3 +27,22 @@ interface NotificationFiltersProps {
   onChange: (filters: any) => void;
 }
 
+export function NotificationFilters({ filters, onChange }: NotificationFiltersProps) {
+  const toggleType = (type: string) => {
+    const types = filters.types || [];
+    const newTypes = types.includes(type)
+      ? types.filter((t: string) => t !== type)
+      : [...types, type];
+    onChange({ ...filters, types: newTypes });
+  };
+
+  const togglePriority = (priority: string) => {
+    const priorities = filters.priorities || [];
+    const newPriorities = priorities.includes(priority)
+      ? priorities.filter((p: string) => p !== priority)
+      : [...priorities, priority];
+    onChange({ ...filters, priorities: newPriorities });
+  };
+
+  
+}
