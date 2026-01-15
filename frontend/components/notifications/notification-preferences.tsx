@@ -100,6 +100,95 @@ export function NotificationPreferences({ userAddress }: NotificationPreferences
           </CardContent>
         </Card>
 
+        {/* Email Notifications */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              <CardTitle>Email Notifications</CardTitle>
+            </div>
+            <CardDescription>
+              Receive notifications via email
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="email-enabled">Enable email notifications</Label>
+              <Switch
+                id="email-enabled"
+                checked={localPrefs.email_enabled}
+                onCheckedChange={(checked) =>
+                  setLocalPrefs({ ...localPrefs, email_enabled: checked })
+                }
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email-digest">Email digest frequency</Label>
+              <Select
+                value={localPrefs.email_digest}
+                onValueChange={(value) =>
+                  setLocalPrefs({ ...localPrefs, email_digest: value })
+                }
+              >
+                <SelectTrigger id="email-digest">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DISABLED">Disabled</SelectItem>
+                  <SelectItem value="REALTIME">Real-time (instant)</SelectItem>
+                  <SelectItem value="DAILY">Daily digest</SelectItem>
+                  <SelectItem value="WEEKLY">Weekly digest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {localPrefs.email_digest === 'DAILY' && (
+              <div className="space-y-2">
+                <Label htmlFor="digest-time">Send digest at</Label>
+                <Input
+                  id="digest-time"
+                  type="time"
+                  value={localPrefs.email_digest_time}
+                  onChange={(e) =>
+                    setLocalPrefs({ ...localPrefs, email_digest_time: e.target.value })
+                  }
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Push Notifications */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5" />
+              <CardTitle>Push Notifications</CardTitle>
+            </div>
+            <CardDescription>
+              Receive push notifications on your device
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="push-enabled">Enable push notifications</Label>
+              <Switch
+                id="push-enabled"
+                checked={localPrefs.push_enabled}
+                onCheckedChange={(checked) =>
+                  setLocalPrefs({ ...localPrefs, push_enabled: checked })
+                }
+              />
+            </div>
+            {localPrefs.push_enabled && (
+              <Button variant="outline" size="sm">
+                Test Push Notification
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+
         
       </div>
     </div>
