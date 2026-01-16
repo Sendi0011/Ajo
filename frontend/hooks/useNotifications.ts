@@ -83,5 +83,25 @@ export function useNotifications({
     };
   }, [fetchNotifications, autoRefresh, userAddress]);
 
-  
+  const markAllAsRead = async () => {
+    try {
+      await fetch('/api/notifications/mark-all-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userAddress }),
+      });
+      await fetchNotifications();
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+    }
+  };
+
+  return {
+    notifications,
+    loading,
+    error,
+    unreadCount,
+    markAllAsRead,
+    refetch: fetchNotifications,
+  };
 }
