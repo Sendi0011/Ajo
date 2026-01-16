@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   
       if (error && error.code !== 'PGRST116') throw error;
   
-      // Create default preferences if not found
+    
       if (!data) {
         const { data: newPrefs, error: createError } = await supabase
           .from('notification_preferences')
