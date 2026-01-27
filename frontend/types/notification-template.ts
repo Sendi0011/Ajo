@@ -1,6 +1,6 @@
 export interface NotificationTemplate {
     id: string;
-    key: string; // Unique identifier like 'payment_reminder_3d'
+    key: string; 
     name: string;
     description: string;
     type: NotificationType;
@@ -13,7 +13,7 @@ export interface NotificationTemplate {
     actionLabel?: string;
     icon?: string;
     color?: string;
-    expiresAfter?: number; // hours
+    expiresAfter?: number; 
     metadata: Record<string, any>;
     isActive: boolean;
     createdAt: string;
