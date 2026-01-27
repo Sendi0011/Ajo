@@ -16,8 +16,8 @@ export interface NotificationPreferences {
     address?: string;
     verified: boolean;
     digest: DigestFrequency;
-    digestTime: string; // HH:MM format (24h)
-    digestDays?: number[]; // 0-6 for weekly digest
+    digestTime: string; 
+    digestDays?: number[];
   }
   
   export interface PushPreferences {
@@ -38,10 +38,10 @@ export interface NotificationPreferences {
   
   export interface SchedulePreferences {
     quietHoursEnabled: boolean;
-    quietHoursStart: string; // HH:MM
-    quietHoursEnd: string; // HH:MM
+    quietHoursStart: string; 
+    quietHoursEnd: string; 
     timezone: string;
-    pausedUntil?: string; // ISO date
+    pausedUntil?: string; 
   }
   
   export interface NotificationTypePreferences {
