@@ -1,6 +1,6 @@
 export interface NotificationGroup {
     id: string;
-    key: string; // e.g., 'payment_reminders_pool_123'
+    key: string; 
     type: NotificationType;
     title: string;
     count: number;
@@ -16,7 +16,7 @@ export interface NotificationGroup {
     id: string;
     type: NotificationType;
     groupBy: ('poolId' | 'type' | 'fromUser')[];
-    maxAge: number; // hours
+    maxAge: number;
     maxCount: number;
     isActive: boolean;
   }
